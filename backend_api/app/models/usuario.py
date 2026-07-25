@@ -1,4 +1,7 @@
 class Usuario:
+    # Constantes
+    _ROL_ADMINISTRADOR: int = 1
+
     # Metodo constructor
     def __init__(self, nombre_usuario: str, contrasena: str, nombre_completo: str, 
                 correo: str) -> None:
@@ -6,7 +9,7 @@ class Usuario:
         self._contrasena = contrasena
         self._nombre_completo = nombre_completo
         self._correo = correo
-        self._tipo  = 0
+        self._tipo  = 0 # Tipo de usurio, 1 para administrador y 0 para cliente
 
     # Metodos getter y setter 
     # Nombre de usuario
@@ -48,12 +51,12 @@ class Usuario:
     # Tipo
     def es_administrador(self) -> bool:
         # Si el tipo es 1 el usuario es administrador, en caso contrario, es un cliente
-        return True if (self._tipo == 1) else False
+        return True if (self._tipo == self._ROL_ADMINISTRADOR) else False
     
-    def asignar_administrador(self, nuevo_tipo: int) -> None:
+    def asignar_administrador(self) -> None:
         # Validacion en caso que el usuario ya sea un administrador
-        if (self._tipo != 1):
+        if (self._tipo == self._ROL_ADMINISTRADOR):
             raise ValueError("El usuario ya es un administrador")
         
         # En caso contrario que no se haya lanzado el error, se procede a cambiar los privilegios del usuario
-        self._tipo = nuevo_tipo
+        self._tipo = self._ROL_ADMINISTRADOR
