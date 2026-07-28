@@ -1,4 +1,4 @@
-from app.models.compra import Compra
+from app.models.vanilla_models.compra import Compra
 
 class CompraCliente(Compra):
     # Metodo constructor
