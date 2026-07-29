@@ -15,19 +15,8 @@ class ProductController
 
         $api = new ApiClient();
 
-        // Datos de Prueba
-        $products = [
-            ['id' => 1, 'name' => 'Balon de Futbol Nike', 'price' => '45.00', 'category_id' => 1],
-            ['id' => 2, 'name' => 'Camiseta Deportiva Adidas', 'price' => '30.00', 'category_id' => 2],
-        ];
-
-        $categories = [
-            ['id' => 1, 'name' => 'Futbol'],
-            ['id' => 2, 'name' => 'Ropa Deportivo']
-        ];
-
-        // $products = $api->get("/products") ?? [];
-        // $categories = $api->get("/categories") ?? [];
+        $products = $api->get("/products") ?? [];
+        $categories = $api->get("/categories") ?? [];
 
         $router->render("products/index", [
             "title" => "Productos",
@@ -55,12 +44,12 @@ class ProductController
 
             $response = $api->post('/products', $payload);
 
-            if ($response && !isset($response['error'])) {
+            if ($response && !isset($response['detail']) && !isset($response['error'])) {
                 header('Location: /products');
                 exit;
             }
 
-            $alerts['error'][] = $response['error'] ?? 'Error al crear el producto';
+            $alerts['error'][] = $response['detail'] ?? $response['error'] ?? 'Error al crear el producto';
         }
 
         $router->render('products/create', [
@@ -101,12 +90,12 @@ class ProductController
 
             $response = $api->put("/products/{$id}", $payload);
 
-            if ($response && !isset($response['error'])) {
+            if ($response && !isset($response['detail']) && !isset($response['error'])) {
                 header('Location: /products');
                 exit;
             }
 
-            $alerts['error'][] = $response['error'] ?? 'Error al actualizar el producto';
+            $alerts['error'][] = $response['detail'] ?? $response['error'] ?? 'Error al actualizar el producto';
         }
 
         $router->render('products/update', [
@@ -129,10 +118,17 @@ class ProductController
 
             if ($response) {
                 header('Content-Type: application/json');
-                echo json_encode([
-                    'resultado' => true,
-                    'mensaje'   => 'Producto Eliminado Exitosamente'
-                ]);
+                if (!isset($response['detail']) && !isset($response['error'])) {
+                    echo json_encode([
+                        'resultado' => true,
+                        'mensaje'   => 'Producto Eliminado Exitosamente'
+                    ]);
+                } else {
+                    echo json_encode([
+                        'resultado' => false,
+                        'mensaje'   => $response['detail'] ?? $response['error'] ?? 'Error al eliminar el producto'
+                    ]);
+                }
                 exit;
             }
         }

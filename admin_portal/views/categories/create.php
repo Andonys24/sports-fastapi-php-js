@@ -1,4 +1,4 @@
-<h1 class="nombre-pagina"><?php echo s($title ?? 'Create Product'); ?></h1>
+<h1 class="nombre-pagina"><?php echo s($title ?? 'Create Category'); ?></h1>
 <p class="descripcion-pagina">Llena los campos para agregar la nueva Categoría</p>
 
 <?php

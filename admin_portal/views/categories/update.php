@@ -1,4 +1,4 @@
-<h1 class="nombre-pagina"><?php echo s($title ?? 'Update Product'); ?></h1>
+<h1 class="nombre-pagina"><?php echo s($title ?? 'Update Category'); ?></h1>
 <p class="descripcion-pagina">Actualiza los datos de la categoría</p>
 
 <?php

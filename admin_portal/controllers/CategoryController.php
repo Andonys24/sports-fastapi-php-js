@@ -37,12 +37,12 @@ class CategoryController
             $api = new ApiClient();
             $response = $api->post('/categories', $payload);
 
-            if ($response && !isset($response['error'])) {
+            if ($response && !isset($response['detail']) && !isset($response['error'])) {
                 header('Location: /categories');
                 exit;
             }
 
-            $alerts['error'][] = $response['error'] ?? 'Error al crear la categoría';
+            $alerts['error'][] = $response['detail'] ?? $response['error'] ?? 'Error al crear la categoría';
         }
 
         $router->render('categories/create', [
@@ -81,12 +81,12 @@ class CategoryController
 
             $response = $api->put("/categories/{$id}", $payload);
 
-            if ($response && !isset($response['error'])) {
+            if ($response && !isset($response['detail']) && !isset($response['error'])) {
                 header('Location: /categories');
                 exit;
             }
 
-            $alerts['error'][] = $response['error'] ?? 'Error al actualizar la categoría';
+            $alerts['error'][] = $response['detail'] ?? $response['error'] ?? 'Error al actualizar la categoría';
         }
 
         $router->render('categories/update', [
@@ -107,10 +107,17 @@ class CategoryController
             $response = $api->delete("/categories/{$id}");
 
             header('Content-Type: application/json');
-            echo json_encode([
-                'resultado' => true,
-                'mensaje'   => 'Categoría Eliminada Exitosamente'
-            ]);
+            if ($response && !isset($response['detail']) && !isset($response['error'])) {
+                echo json_encode([
+                    'resultado' => true,
+                    'mensaje'   => 'Categoría Eliminada Exitosamente'
+                ]);
+            } else {
+                echo json_encode([
+                    'resultado' => false,
+                    'mensaje'   => $response['detail'] ?? $response['error'] ?? 'Error al eliminar la categoría'
+                ]);
+            }
             exit;
         }
     }

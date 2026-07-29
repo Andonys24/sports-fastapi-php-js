@@ -12,7 +12,7 @@
                 <?php foreach ($categories ?? [] as $category) :
                     $cat_id = $category['id'] ?? null;
                     $prod_cat_id = $product['category_id'] ?? null;
-                    if ($prod_cat_id === $cat_id) : ?>
+                    if ((string)$prod_cat_id === (string)$cat_id) : ?>
                         <p>Categoría: <span><?php echo s($category['name'] ?? ''); ?></span></p>
                 <?php
                     endif;
