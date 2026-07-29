@@ -11,6 +11,13 @@
         <a href="/products/create" class="boton">Agregar Producto</a>
         <a href="/categories" class="boton">Ver Categorías</a>
         <a href="/categories/create" class="boton">Agregar Categoría</a>
+        <a href="/users" class="boton">Ver Usuarios</a>
+        <a href="/users/create" class="boton">Agregar Usuario</a>
+        <a href="/providers" class="boton">Ver Proveedores</a>
+        <a href="/providers/create" class="boton">Agregar Proveedor</a>
+        <a href="/purchases" class="boton">Ver Compras</a>
+        <a href="/purchases/create" class="boton">Registrar Compra</a>
+        <a href="/inventory" class="boton">Ver Inventario</a>
         <a href="/admin" class="boton">Ver Encargos</a>
     </div>
 <?php endif; ?>
