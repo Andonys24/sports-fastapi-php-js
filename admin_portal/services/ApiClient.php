@@ -23,8 +23,17 @@ class ApiClient
         return $this->request("POST", $endpoint, $data);
     }
 
-    // Controlador de ejecución cURL base
+    public function put(string $endpoint, array $data = []): array
+    {
+        return $this->request("PUT", $endpoint, $data);
+    }
 
+    public function delete(string $endpoint): array
+    {
+        return $this->request("DELETE", $endpoint);
+    }
+
+    // Controlador de ejecución cURL base
     private function request(string $method, string $endpoint, array $data = []): array
     {
         $url = $this->baseUrl . $endpoint;

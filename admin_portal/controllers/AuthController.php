@@ -37,7 +37,7 @@ class AuthController
                 ]);
 
                 // Compruebar si la autenticación se realizó correctamente y si el usuario tiene el rol de 'administrador'.
-                if (isset($response['id']) && isset($response['rol']) && $response['rol'] == ROLE_ADMIN) {
+                if (isset($response['id']) && isset($response['role']) && $response['role'] == ROLE_ADMIN) {
                     if (session_status() === PHP_SESSION_NONE) {
                         session_start();
                     }
@@ -47,11 +47,11 @@ class AuthController
                     $_SESSION["email"] = $response["email"];
                     $_SESSION["role"] = $response["role"];
                     $_SESSION["login"] = true;
-                    header('Location: /dashboard');
+                    header('Location: /admin');
                     exit;
+                } else {
+                    $alerts['error'][] = $response['detail'] ?? 'Credenciales incorrectas o acceso no autorizado';
                 }
-            } else {
-                $alerts['error'][] = $response['detail'] ?? 'Credenciales incorrectas o acceso no autorizado';
             }
         }
 
