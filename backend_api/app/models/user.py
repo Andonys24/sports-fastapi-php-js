@@ -1,15 +1,25 @@
-from sqlalchemy import Column, Integer, String
-from app.database.database import Base
+from pydantic import BaseModel
+from typing import Optional
 
-class User(Base):
-    # Nombre de la tabla
-    __tablename__ = 'usuarios'
+class UserBase(BaseModel):
+    username: str
+    password: str
+    full_name: str
+    email: str
+    admin: int = 0 # Por defecto no son administradores
 
-    # Crea la columna que pertenece a la Primary Key de la tabla, siendo el id unico de cada objetivo
-    # en la base de datos
-    id = Column(Integer, primary_key=True, index=True) 
-    username = Column(String, index=True)
-    password = Column(String, index=True)
-    full_name = Column(String, index=True)
-    email = Column(String, index=True)
-    admin = Column(Integer, default=0)
+class UserUpdate(BaseModel):
+    username: Optional[str] = None
+    password: Optional[str] = None
+    full_name: Optional[str] = None
+    email: Optional[str] = None
+    admin: Optional[int] = None
+
+class UserCreate(UserBase):
+    pass
+
+class UserResponse(UserBase):
+    id: int
+
+    class Config:
+        from_attributes = True

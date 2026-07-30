@@ -3,7 +3,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
 from typing import Annotated
-
 from dotenv import load_dotenv
 import os
 
@@ -19,7 +18,7 @@ if not DATABASE_URL:
 
 engine_db = create_engine(DATABASE_URL) # Crea el motor de la base de datos en base a la sesion obtenida por la URL
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine_db) 
+SessionLocal = sessionmaker(bind=engine_db, autocommit=False, autoflush=False) 
 Base = declarative_base()
 
 # Permite obtener la sesion de la base de datos
@@ -32,5 +31,5 @@ def get_db():
     finally:
         database.close() 
 
-# Se especifica que la sesion va a depender de la funcion get_db()
+# Se crea un nuevo tipo a partir de Session, que contiene el contexto de Depends()
 db_dependency = Annotated[Session, Depends(get_db)]

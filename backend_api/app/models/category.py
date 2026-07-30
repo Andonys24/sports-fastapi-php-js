@@ -1,11 +1,19 @@
-from sqlalchemy import Column, Integer, String
-from app.database.database import Base
+from pydantic import BaseModel
+from typing import Optional
 
-class Category(Base):
-    # Nombre de la tabla
-    __tablename__ = 'categorias'
+class CategoryBase(BaseModel):
+    name: str
+    description: str
 
-    # Columnas respectivas a la clase
-    id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String, index=True)
-    descripcion = Column(String, index=True)
+class CategoryUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+
+class CategoryCreate(CategoryBase):
+    pass
+
+class CategoryResponse(CategoryBase):
+    id: int
+
+    class Config:
+        from_attributes = True

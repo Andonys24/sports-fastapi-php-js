@@ -1,15 +1,29 @@
-from sqlalchemy import Column, Integer, String, REAL, ForeignKey
-from app.database.database import Base
+from pydantic import BaseModel
+from typing import Optional
 
-class Product(Base):
-    # Nombre de la tabla
-    __tablename__ = 'productos'
+class ProductBase(BaseModel):
+    category_id: int
+    provider_id: int
+    name: str
+    price: float
+    brand: str
+    stock: int = 0
+    img_url: str
 
-    # Columnas respectivas a la tabla de esta clase
-    id = Column(Integer, primary_key=True, index=True)
-    id_category = Column(Integer, ForeignKey("categorias.id"))
-    id_provider = Column(Integer, ForeignKey("proveedores.id"))
-    description = Column(String, index=True)
-    price = Column(REAL, index=True)
-    brand = Column(String, index=True)
-    stock = Column(Integer, default=0)  
+class ProductUpdate(BaseModel):
+    category_id: Optional[int] = None
+    provider_id: Optional[int] = None
+    name: Optional[str] = None
+    price: Optional[float] = None
+    brand: Optional[str] = None
+    stock: Optional[int] = None
+    img_url: Optional[str] = None
+
+class ProductCreate(ProductBase):
+    pass
+
+class ProductResponse(ProductBase):
+    id: int
+
+    class Config:
+        from_attributes = True
