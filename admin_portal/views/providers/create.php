@@ -1,5 +1,5 @@
 <h1 class="nombre-pagina"><?php echo s($title ?? 'Nuevo Proveedor'); ?></h1>
-<p class="descripcion-pagina">Prepara la estructura del formulario de proveedores.</p>
+<p class="descripcion-pagina">Registra un nuevo proveedor.</p>
 
 <?php
 include_once __DIR__ . '/../templates/bar.php';

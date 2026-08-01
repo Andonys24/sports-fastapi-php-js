@@ -1,8 +1,22 @@
 <h1 class="nombre-pagina"><?php echo s($title ?? 'Usuarios'); ?></h1>
-<p class="descripcion-pagina">Módulo base preparado para integrar gestión de usuarios con FastAPI.</p>
+<p class="descripcion-pagina">Administra los usuarios registrados en el sistema.</p>
 
 <?php include_once __DIR__ . '/../templates/bar.php'; ?>
 
-<div class="no-encargos">
-    Aún no existe el endpoint definitivo de usuarios.
-</div>
+<ul class="productos">
+    <?php if (!empty($users)) : ?>
+        <?php foreach ($users as $user) : ?>
+            <li>
+                <p>Usuario: <span><?php echo s($user['username'] ?? ''); ?></span></p>
+                <p>Nombre: <span><?php echo s($user['full_name'] ?? ''); ?></span></p>
+                <p>Email: <span><?php echo s($user['email'] ?? ''); ?></span></p>
+                <div class="acciones">
+                    <a class="boton" href="/users/update?id=<?php echo s($user['id']); ?>">Actualizar</a>
+                    <button type="button" data-id="<?php echo s($user['id']); ?>" class="boton-eliminar usuario">Eliminar</button>
+                </div>
+            </li>
+        <?php endforeach; ?>
+    <?php else : ?>
+        <h2 class="no-encargos">No hay usuarios disponibles</h2>
+    <?php endif; ?>
+</ul>

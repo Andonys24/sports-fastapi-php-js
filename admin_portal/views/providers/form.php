@@ -15,17 +15,27 @@
         id="telefono"
         name="telefono"
         placeholder="Teléfono del proveedor"
-        value="<?php echo s($provider['phone'] ?? ''); ?>">
+        value="<?php echo s($provider['phone_number'] ?? ''); ?>">
 </div>
 
 <div class="campo">
-    <label for="email">Email</label>
+    <label for="periodo_contrato">Periodo de Contrato</label>
     <input
-        type="email"
-        id="email"
-        name="email"
-        placeholder="Email del proveedor"
-        value="<?php echo s($provider['email'] ?? ''); ?>">
+        type="number"
+        id="periodo_contrato"
+        name="periodo_contrato"
+        placeholder="Periodo del contrato"
+        value="<?php echo s((string)($provider['contract_period'] ?? '')); ?>">
+</div>
+
+<div class="campo">
+    <label for="tipo_contrato">Tipo de Contrato</label>
+    <input
+        type="text"
+        id="tipo_contrato"
+        name="tipo_contrato"
+        placeholder="Tipo de contrato"
+        value="<?php echo s($provider['contract_type'] ?? ''); ?>">
 </div>
 
 <div class="campo">

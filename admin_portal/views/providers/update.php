@@ -1,5 +1,5 @@
 <h1 class="nombre-pagina"><?php echo s($title ?? 'Actualizar Proveedor'); ?></h1>
-<p class="descripcion-pagina">Prepara la estructura de edición de proveedores.</p>
+<p class="descripcion-pagina">Edita los datos del proveedor.</p>
 
 <?php
 include_once __DIR__ . '/../templates/bar.php';

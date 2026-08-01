@@ -36,3 +36,30 @@
         step="0.01"
         min="0">
 </div>
+
+<div class="campo">
+    <label for="proveedor">Proveedor</label>
+    <select name="provider_id" id="proveedor">
+        <option value="" disabled <?php echo empty($product['provider_id'] ?? null) ? 'selected' : ''; ?>>-- Seleccionar Proveedor --</option>
+        <?php foreach ($providers ?? [] as $provider) : ?>
+            <option value="<?php echo s($provider['id']); ?>" <?php echo (($product['provider_id'] ?? '') == $provider['id']) ? 'selected' : ''; ?>>
+                <?php echo s($provider['name']); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+</div>
+
+<div class="campo">
+    <label for="brand">Marca</label>
+    <input type="text" id="brand" placeholder="Marca del producto" name="brand" value="<?php echo s($product['brand'] ?? ''); ?>">
+</div>
+
+<div class="campo">
+    <label for="stock">Stock</label>
+    <input type="number" id="stock" placeholder="Cantidad en stock" name="stock" min="0" value="<?php echo s($product['stock'] ?? 0); ?>">
+</div>
+
+<div class="campo">
+    <label for="img_url">URL de Imagen</label>
+    <input type="text" id="img_url" placeholder="https://..." name="img_url" value="<?php echo s($product['img_url'] ?? ''); ?>">
+</div>

@@ -9,7 +9,9 @@ class CategoryController
 {
     public static function index(Router $router)
     {
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         isAdmin();
 
         $api = new ApiClient();
@@ -21,19 +23,26 @@ class CategoryController
         ]);
     }
 
+    private static function getPayload(): array
+    {
+        return [
+            'name' => $_POST['nombre'] ?? '',
+            'description' => $_POST['descripcion'] ?? ''
+        ];
+    }
+
     public static function create(Router $router)
     {
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         isAdmin();
 
         $alerts = [];
         $category = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $payload = [
-                'name' => $_POST['nombre'] ?? '',
-                'description' => $_POST['descripcion'] ?? ''
-            ];
+            $payload = self::getPayload();
             $api = new ApiClient();
             $response = $api->post('/categories', $payload);
 
@@ -54,7 +63,9 @@ class CategoryController
 
     public static function update(Router $router)
     {
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         isAdmin();
 
         $alerts = [];
@@ -74,10 +85,7 @@ class CategoryController
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $payload = [
-                'name' => $_POST['nombre'] ?? '',
-                'description' => $_POST['descripcion'] ?? ''
-            ];
+            $payload = self::getPayload();
 
             $response = $api->put("/categories/{$id}", $payload);
 
@@ -99,23 +107,38 @@ class CategoryController
     public static function delete()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            session_start();
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
             isAdmin();
 
             $id = $_POST['id'] ?? null;
+
+            header('Content-Type: application/json');
+
+            if (!$id) {
+                echo json_encode([
+                    'resultado' => false,
+                    'mensaje'   => 'ID de categoría no válido'
+                ]);
+                exit;
+            }
+
             $api = new ApiClient();
             $response = $api->delete("/categories/{$id}");
 
-            header('Content-Type: application/json');
             if ($response && !isset($response['detail']) && !isset($response['error'])) {
                 echo json_encode([
                     'resultado' => true,
                     'mensaje'   => 'Categoría Eliminada Exitosamente'
                 ]);
             } else {
+                $rawError = $response['detail'] ?? $response['error'] ?? 'Error al eliminar la categoría';
+                $errorMessage = is_array($rawError) ? ($rawError[0]['msg'] ?? json_encode($rawError)) : $rawError;
+
                 echo json_encode([
                     'resultado' => false,
-                    'mensaje'   => $response['detail'] ?? $response['error'] ?? 'Error al eliminar la categoría'
+                    'mensaje'   => is_string($errorMessage) ? $errorMessage : 'Error desconocido en la API'
                 ]);
             }
             exit;

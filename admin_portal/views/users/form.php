@@ -1,11 +1,21 @@
 <div class="campo">
-    <label for="nombre">Nombre</label>
+    <label for="username">Username</label>
+    <input
+        type="text"
+        id="username"
+        name="username"
+        placeholder="Nombre de usuario único"
+        value="<?php echo s($user['username'] ?? ''); ?>">
+</div>
+
+<div class="campo">
+    <label for="nombre">Nombre Completo</label>
     <input
         type="text"
         id="nombre"
         name="nombre"
-        placeholder="Nombre del usuario"
-        value="<?php echo s($user['name'] ?? ''); ?>">
+        placeholder="Nombre completo del usuario"
+        value="<?php echo s($user['full_name'] ?? ''); ?>">
 </div>
 
 <div class="campo">
@@ -14,7 +24,7 @@
         type="email"
         id="email"
         name="email"
-        placeholder="Email del usuario"
+        placeholder="Correo electrónico"
         value="<?php echo s($user['email'] ?? ''); ?>">
 </div>
 
@@ -24,13 +34,5 @@
         type="password"
         id="password"
         name="password"
-        placeholder="Password del usuario">
-</div>
-
-<div class="campo">
-    <label for="role">Rol</label>
-    <select name="role" id="role">
-        <option value="1">Administrador</option>
-        <option value="2">Cliente</option>
-    </select>
+        placeholder="Contraseña segura">
 </div>

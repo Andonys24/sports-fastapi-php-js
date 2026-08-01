@@ -8,6 +8,7 @@
         <?php foreach ($categories as $category) : ?>
             <li>
                 <p>Nombre: <span><?php echo s($category['name'] ?? ''); ?></span></p>
+                <p>Descripcion: <span><?php echo s($category['description'] ?? ''); ?></span></p>
                 <div class="acciones">
                     <a class="boton" href="/categories/update?id=<?php echo s($category['id']); ?>">Actualizar</a>
                     <input type="submit" data-id="<?php echo s($category['id']); ?>" value="Eliminar" class="boton-eliminar categoria">

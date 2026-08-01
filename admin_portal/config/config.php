@@ -1,7 +1,7 @@
 <?php
 
 // URL base donde corre FastAPI
-define("API_BASE_URL", "http://localhost:8000");
+define("API_BASE_URL", "http://localhost:8000/api/v1");
 
 define("APP_NAME", "Admin Sport Store");
 

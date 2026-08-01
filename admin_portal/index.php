@@ -58,12 +58,12 @@ $router->post('/users/update', [UserController::class, 'update']);
 $router->post('/users/delete', [UserController::class, 'delete']);
 
 // CRUD de Proveedores
-$router->get('/providers', [ProviderController::class, 'index']);
-$router->get('/providers/create', [ProviderController::class, 'create']);
-$router->post('/providers/create', [ProviderController::class, 'create']);
-$router->get('/providers/update', [ProviderController::class, 'update']);
-$router->post('/providers/update', [ProviderController::class, 'update']);
-$router->post('/providers/delete', [ProviderController::class, 'delete']);
+$router->get('/suppliers', [ProviderController::class, 'index']);
+$router->get('/suppliers/create', [ProviderController::class, 'create']);
+$router->post('/suppliers/create', [ProviderController::class, 'create']);
+$router->get('/suppliers/update', [ProviderController::class, 'update']);
+$router->post('/suppliers/update', [ProviderController::class, 'update']);
+$router->post('/suppliers/delete', [ProviderController::class, 'delete']);
 
 // Compras para inventario
 $router->get('/purchases', [PurchaseController::class, 'index']);

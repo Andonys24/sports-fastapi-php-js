@@ -10,7 +10,9 @@ class AdminController
 
     public static function index(Router $router)
     {
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         isAdmin();
 
         $date = $_GET["date"] ?? date("Y-m-d");
@@ -24,7 +26,8 @@ class AdminController
         $api = new ApiClient();
 
         // Consultar pedidos a la API de FastAPI
-        $orders = $api->get("/orders?date={$date}") ?? [];
+        $ordersResponse = $api->get("/orders?date={$date}");
+        $orders = is_array($ordersResponse) && array_is_list($ordersResponse) ? $ordersResponse : [];
 
         $router->render("admin/index", [
             "title" => "Panel de Administracion",

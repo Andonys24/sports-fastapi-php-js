@@ -6,21 +6,21 @@
 <ul class="productos">
     <?php if (!empty($products)) : ?>
         <?php foreach ($products as $product) : ?>
+            <?php
+            $catId = $product['category_id'] ?? null;
+            $provId = $product['provider_id'] ?? null;
+            ?>
             <li>
                 <p>Nombre: <span><?php echo s($product['name'] ?? ''); ?></span></p>
                 <p>Precio: <span>L. <?php echo s($product['price'] ?? '0.00'); ?></span></p>
-                <?php foreach ($categories ?? [] as $category) :
-                    $cat_id = $category['id'] ?? null;
-                    $prod_cat_id = $product['category_id'] ?? null;
-                    if ((string)$prod_cat_id === (string)$cat_id) : ?>
-                        <p>Categoría: <span><?php echo s($category['name'] ?? ''); ?></span></p>
-                <?php
-                    endif;
-                endforeach;
-                ?>
+
+                <!-- Búsqueda directa y limpia -->
+                <p>Categoría: <span><?php echo s($categories[$catId] ?? 'Sin categoría'); ?></span></p>
+                <p>Proveedor: <span><?php echo s($providers[$provId] ?? 'Sin proveedor'); ?></span></p>
+
                 <div class="acciones">
                     <a class="boton" href="/products/update?id=<?php echo s($product['id']); ?>">Actualizar</a>
-                    <input type="submit" data-id="<?php echo s($product['id']); ?>" value="Eliminar" class="boton-eliminar producto">
+                    <button type="button" data-id="<?php echo s($product['id']); ?>" class="boton-eliminar producto">Eliminar</button>
                 </div>
             </li>
         <?php endforeach; ?>
