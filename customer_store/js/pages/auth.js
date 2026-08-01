@@ -22,16 +22,42 @@ class AuthManager {
     }
 
     async login(email, password) {
-        // Enviar credenciales al endpoint /api/v1/login
-        const respuesta = await this.api.post('/login', { email, password });
+    // 1. OAuth2 requiere estrictamente 'username' y 'password'
+    const formData = new URLSearchParams();
+    formData.append('username', email); // Pasamos el email en el campo username
+    formData.append('password', password);
+
+    try {
+        // 2. Hacemos la petición enviando el Content-Type correcto
+        const response = await fetch(`${this.api.baseUrl}/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData.toString()
+        });
+
+        if (!response.ok) {
+            console.error(`Error ${response.status}: Credenciales inválidas`);
+            return false;
+        }
+
+        const respuesta = await response.json();
         
-        if (respuesta && !respuesta.error) {
-            // Guardamos la información del usuario (nombre, id, email) en localStorage
-            this.iniciarSesionLocal(respuesta.usuario);
+        // 3. FastAPI con OAuth2 suele devolver un token { "access_token": "...", "token_type": "bearer" }
+        if (respuesta && respuesta.access_token) {
+            // Guardamos el token y un objeto de usuario simulado o devuelto
+            const usuario = respuesta.usuario || { email: email, nombre: email.split('@')[0] };
+                                 
+            this.iniciarSesionLocal(usuario);
             return true;
         }
-        return false;
+    } catch (error) {
+        console.error("Error durante el inicio de sesión:", error);
     }
+    
+    return false;
+}
 
     async logout() {
         // Llamar al backend para destruir la cookie de sesión si existe

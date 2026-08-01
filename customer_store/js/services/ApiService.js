@@ -1,6 +1,6 @@
 class ApiService {
     constructor() {
-        this.baseUrl = '/api/v1';
+        this.baseUrl = 'http://127.0.0.1:8000/api/v1';
     }
 
     async get(endpoint) {
