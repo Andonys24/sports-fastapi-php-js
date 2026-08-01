@@ -44,6 +44,14 @@
         <!-- Vista: Catálogo -->
         <section id="vista-catalogo" style="display: none;">
             <h2>Nuestro Catálogo</h2>
+            <!-- Filtro por categoría -->
+            <div style="margin-bottom: 1.5rem;">
+                <label for="filtro-categoria">Filtrar por: </label>
+                <select id="filtro-categoria" style="max-width: 250px;">
+                <option value="Todas">Cargando categorías...</option>
+            </select>
+            </div>
+            
             <div id="catalogo-productos" class="grid-productos">
                 <!-- Se inyecta con catalogo.js -->
             </div>
@@ -64,12 +72,22 @@
             <div id="checkout-resumen"></div>
             <form id="form-checkout">
                 <input type="text" id="nombre" placeholder="Nombre completo" required>
-                <input type="text" id="direccion" placeholder="Dirección de envío" required>
-                <select id="metodo_pago" required>
-                    <option value="Efectivo">Pago en Efectivo al recibir</option>
+
+                <!-- Opción de entrega a domicilio alineada con CompraCliente -->
+                <div style="margin: 1rem 0;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="checkbox" id="entrega-domicilio" style="width: auto;">
+                    <strong>Solicitar entrega a domicilio</strong>
+                </label>
+                </div>
+
+                <!-- Este input se mostrará/ocultará dinámicamente -->
+                <input type="text" id="direccion" placeholder="Dirección de entrega" style="display: none;">
+                    <select id="metodo_pago" required>
+                    <option value="Efectivo">Pago en Efectivo</option>
                     <option value="Transferencia">Transferencia Bancaria</option>
                 </select>
-                <button type="submit">Confirmar Pedido</button>
+                <button type="submit">Confirmar Pedido y Generar Factura</button>
             </form>
         </section>
 

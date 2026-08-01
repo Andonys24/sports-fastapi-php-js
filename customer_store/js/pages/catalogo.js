@@ -72,10 +72,17 @@ class Catalogo {
             const textoBoton = hayStock ? 'Añadir al Carrito' : 'Agotado';
             const botonDisabled = hayStock ? '' : 'disabled style="background-color: #94a3b8; cursor: not-allowed;"';
 
+            // Manejo de imagen con fallback en caso de error 404 de FastAPI
+            const imgUrl = producto.img_url || 'https://via.placeholder.com/280x200?text=Sin+Imagen';
+
+            const div = document.createElement('div');
+
             const div = document.createElement('div');
             div.className = 'producto-card';
             div.innerHTML = `
-                <img src="${producto.img_url}" alt="${producto.name}" style="width: 100%; border-radius: 8px; margin-bottom: 1rem;">
+                <div style="height: 200px; overflow: hidden; border-radius: 8px; margin-bottom: 1rem;">
+                    <img src="${imgUrl}" alt="${producto.name}" onerror="this.src='https://via.placeholder.com/280x200?text=Error+de+Imagen'" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
                 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                     <span style="background:#e2e8f0; padding:2px 8px; border-radius:10px; font-size:0.8rem;">
@@ -87,7 +94,9 @@ class Catalogo {
                 </div>
                 
                 <h3>${producto.name}</h3>
-                <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 0.5rem;">Marca: ${producto.brand}</p>
+                <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 0.5rem;">Marca: ${producto.brand || 'N/A'}</p>
+                <p style="font-size: 0.85rem; color: #475569; margin-bottom: 1rem;">
+                ${producto.descripcion || 'Sin descripción disponible.'}</p>
                 <p><strong>${this.formateadorMoneda.format(producto.price)}</strong></p>
                 
                 <button ${botonDisabled} onclick="carrito.agregar(${producto.id}, '${producto.name}', ${producto.price})">

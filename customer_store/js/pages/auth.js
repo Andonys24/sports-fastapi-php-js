@@ -34,7 +34,7 @@ class AuthManager {
     }
 
     async logout() {
-        // Opcional: Llamar al backend para destruir la cookie de sesión si existe
+        // Llamar al backend para destruir la cookie de sesión si existe
         await this.api.post('/logout', {}); 
         
         // Limpiamos el almacenamiento local
@@ -89,6 +89,12 @@ class AuthUI {
         const exito = await this.auth.login(email, password);
         
         if (exito) {
+            // Validar si es administrador
+            if (this.auth.usuarioActual.tipo === 1) { // Ajusta el número según tu lógica
+                alert('Eres administrador. Por favor, dirígete al portal de gestión en PHP.');
+                this.auth.logout(); // Cierra la sesión en el lado del cliente
+                return;
+            }
             alert(`¡Bienvenido de nuevo!`);
             window.location.href = '/catalogo'; // Redirigir tras login exitoso
         } else {
