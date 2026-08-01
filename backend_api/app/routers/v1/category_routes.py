@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Path, Body
 from models.category import CategoryCreate, CategoryUpdate, CategoryResponse
 from services.category_service import CategoryService
 from db.database import db_dependency
@@ -18,7 +18,7 @@ async def get_categories(skip: int = 0, limit: int = 100, service: CategoryServi
     return service.get_categories(skip, limit)
 
 @router.get("/{id}", response_model=CategoryResponse, status_code=200)
-async def get_category_id(category_id: int, service: CategoryService = Depends(get_category_service)):
+async def get_category_id(category_id: int = Path(..., alias="id"), service: CategoryService = Depends(get_category_service)):
     category = service.get_category_id(category_id)
 
     if not category:
@@ -27,7 +27,7 @@ async def get_category_id(category_id: int, service: CategoryService = Depends(g
     return category
 
 @router.put("/{id}", response_model=CategoryResponse, status_code=200)
-async def update_category(category_id: int, category_update: CategoryUpdate, service: CategoryService = Depends(get_category_service)):
+async def update_category(category_id: int = Path(..., alias="id"), category_update: CategoryUpdate = Body(...), service: CategoryService = Depends(get_category_service)):
     try:
         category = service.update_category(category_id=category_id, **category_update.model_dump())
         
@@ -36,16 +36,16 @@ async def update_category(category_id: int, category_update: CategoryUpdate, ser
 
         return category
     except Exception:
-        raise HTTPException(status_code=304, detail="Hubo un error al escribir en la base de datos al actualizar")
+        raise HTTPException(status_code=500, detail="Hubo un error al escribir en la base de datos al actualizar")
 
-@router.delete("/{id}", status_code=204)
-async def delete_category(category_id: int, service: CategoryService = Depends(get_category_service)):
+@router.delete("/{id}", status_code=200)
+async def delete_category(category_id: int = Path(..., alias="id"), service: CategoryService = Depends(get_category_service)):
     try:
         category_confirmation = service.delete_category(category_id)
         
         if not category_confirmation:
             raise HTTPException(status_code=404, detail="Categoria no encontrada")
 
-        return {"success": True}
+        return {"resultado": True, "mensaje": "Categoria eliminada exitosamente"}
     except Exception:
-        raise HTTPException(status_code=304, detail="Hubo un error al escribir en la base de datos al actualizar")
+            raise HTTPException(status_code=500, detail="Hubo un error al escribir en la base de datos al actualizar")

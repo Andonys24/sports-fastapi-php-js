@@ -20,7 +20,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme),
     try:
         if (not SECRET_KEY or not ALGORITHM):
             raise HTTPException(
-                status_code=304, 
+                status_code=500, 
                 detail="Hubo un error en el token",
                 headers={"WWW-Authenticate": "Bearer"})
 
@@ -46,7 +46,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme),
         return user # Se retorna el usuario actual, despues de una serie de validaciones
     except JWTError:
         raise HTTPException(
-                status_code=304, 
+                status_code=401, 
                 detail="No se pudieron validar las credenciales",
                 headers={"WWW-Authenticate": "Bearer"})
 

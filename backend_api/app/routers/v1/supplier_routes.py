@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Path
+from fastapi import Body
 from models.supplier import SupplierCreate, SupplierUpdate, SupplierResponse
 from services.supplier_service import SupplierService
 from db.database import db_dependency
@@ -18,7 +19,7 @@ async def get_suppliers(skip: int = 0, limit: int = 100, service: SupplierServic
     return service.get_suppliers(skip, limit)
 
 @router.get("/{id}", response_model=SupplierResponse, status_code=200)
-async def get_supplier_id(supplier_id: int, service: SupplierService = Depends(get_supplier_service)):
+async def get_supplier_id(supplier_id: int = Path(..., alias="id"), service: SupplierService = Depends(get_supplier_service)):
     supplier = service.get_supplier_id(supplier_id)
 
     if not supplier:
@@ -27,7 +28,7 @@ async def get_supplier_id(supplier_id: int, service: SupplierService = Depends(g
     return supplier
 
 @router.put("/{id}", response_model=SupplierResponse, status_code=200)
-async def update_supplier(supplier_id: int, supplier_update: SupplierUpdate, service: SupplierService = Depends(get_supplier_service)):
+async def update_supplier(supplier_id: int = Path(..., alias="id"), supplier_update: SupplierUpdate = Body(...), service: SupplierService = Depends(get_supplier_service)):
     try:
         supplier = service.update_supplier(supplier_id=supplier_id, **supplier_update.model_dump())
         
@@ -36,16 +37,16 @@ async def update_supplier(supplier_id: int, supplier_update: SupplierUpdate, ser
 
         return supplier
     except Exception:
-        raise HTTPException(status_code=304, detail="Hubo un error al escribir en la base de datos al actualizar")
+        raise HTTPException(status_code=500, detail="Hubo un error al escribir en la base de datos al actualizar")
 
-@router.delete("/{id}", status_code=204)
-async def delete_supplier(supplier_id: int, service: SupplierService = Depends(get_supplier_service)):
+@router.delete("/{id}", status_code=200)
+async def delete_supplier(supplier_id: int = Path(..., alias="id"), service: SupplierService = Depends(get_supplier_service)):
     try:
         supplier_confirmation = service.delete_supplier(supplier_id)
         
         if not supplier_confirmation:
             raise HTTPException(status_code=404, detail="Proveedor no encontrado")
 
-        return {"success": True}
+        return {"resultado": True, "mensaje": "Proveedor eliminado exitosamente"}
     except Exception:
-        raise HTTPException(status_code=304, detail="Hubo un error al escribir en la base de datos al actualizar")
+        raise HTTPException(status_code=500, detail="Hubo un error al escribir en la base de datos al actualizar")

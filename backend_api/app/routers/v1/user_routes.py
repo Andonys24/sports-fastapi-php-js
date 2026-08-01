@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Path, Body
 from models.user import UserCreate, UserUpdate, UserResponse
 from services.user_service import UserService
 from services.authentication_utils import hash_password
@@ -41,7 +41,7 @@ async def get_users(skip: int = 0, limit: int = 100, service: UserService = Depe
 
 # Metodo GET para obtener un usuario en base a su id
 @router.get("/{id}", response_model=UserResponse, status_code=200)
-async def get_user_id(user_id: int, service: UserService = Depends(get_user_service)):
+async def get_user_id(user_id: int = Path(..., alias="id"), service: UserService = Depends(get_user_service)):
     user_finded = service.get_user_id(user_id)
     
     # Validacion en el caso que user_finded sea None, es decir, no se haya encontrado ninguna coincidencia
@@ -53,7 +53,7 @@ async def get_user_id(user_id: int, service: UserService = Depends(get_user_serv
 
 # Metodo PUT para actualizar la configuracion de un usuario creado previamente
 @router.put("/{id}", response_model=UserResponse, status_code=200)
-async def update_user(id_user: int, user_update: UserUpdate, service: UserService = Depends(get_user_service)):
+async def update_user(id_user: int = Path(..., alias="id"), user_update: UserUpdate = Body(...), service: UserService = Depends(get_user_service)):
     try:
         # Solo si se envia una contrasena para actualizar, entonces crea una nueva contrasena encriptada
         if user_update.password: 
@@ -74,17 +74,17 @@ async def update_user(id_user: int, user_update: UserUpdate, service: UserServic
 
         return user_tmp
     except Exception:
-        raise HTTPException(status_code=304, detail="Hubo un error al escribir en la base de datos al actualizar")
+        raise HTTPException(status_code=500, detail="Hubo un error al escribir en la base de datos al actualizar")
 
 # Metodo DELETE, simplemente para eliminar un usuario de la base de datos en base a su id
-@router.delete("/{id}", status_code=204)
-async def delete_user(id_user: int, service: UserService = Depends(get_user_service)):
+@router.delete("/{id}", status_code=200)
+async def delete_user(id_user: int = Path(..., alias="id"), service: UserService = Depends(get_user_service)):
     try:
         confirmation = service.delete_user(id_user)
 
         if (not confirmation):
             raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-        return {"success": True}
+        return {"resultado": True, "mensaje": "Usuario eliminado exitosamente"}
     except Exception:
-        raise HTTPException(status_code=304, detail="Hubo un error al escribir en la base de datos al eliminar")
+        raise HTTPException(status_code=500, detail="Hubo un error al escribir en la base de datos al eliminar")

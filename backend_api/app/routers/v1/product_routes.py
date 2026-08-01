@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Path
+from fastapi import Body
 from models.product import ProductCreate, ProductUpdate, ProductResponse
 from services.product_service import ProductService
 from db.database import db_dependency
@@ -18,7 +19,7 @@ async def get_products(skip: int = 0, limit: int = 100, service: ProductService 
     return service.get_products(skip, limit)
 
 @router.get("/{id}", response_model=ProductResponse, status_code=200)
-async def get_product_id(product_id: int, service: ProductService = Depends(get_product_service)):
+async def get_product_id(product_id: int = Path(..., alias="id"), service: ProductService = Depends(get_product_service)):
     product = service.get_product_id(product_id)
 
     if not product:
@@ -27,7 +28,7 @@ async def get_product_id(product_id: int, service: ProductService = Depends(get_
     return product
 
 @router.put("/{id}", response_model=ProductResponse, status_code=200)
-async def update_product(product_id: int, product_update: ProductUpdate, service: ProductService = Depends(get_product_service)):
+async def update_product(product_id: int = Path(..., alias="id"), product_update: ProductUpdate = Body(...), service: ProductService = Depends(get_product_service)):
     try:
         product = service.update_product(product_id=product_id, **product_update.model_dump())
         
@@ -36,16 +37,16 @@ async def update_product(product_id: int, product_update: ProductUpdate, service
 
         return product
     except Exception:
-        raise HTTPException(status_code=304, detail="Hubo un error al escribir en la base de datos al actualizar")
+        raise HTTPException(status_code=500, detail="Hubo un error al escribir en la base de datos al actualizar")
 
-@router.delete("/{id}", status_code=204)
-async def delete_product(product_id: int, service: ProductService = Depends(get_product_service)):
+@router.delete("/{id}", status_code=200)
+async def delete_product(product_id: int = Path(..., alias="id"), service: ProductService = Depends(get_product_service)):
     try:
         product_confirmation = service.delete_product(product_id)
         
         if not product_confirmation:
             raise HTTPException(status_code=404, detail="Producto no encontrado")
 
-        return {"success": True}
+        return {"resultado": True, "mensaje": "Producto eliminado exitosamente"}
     except Exception:
-        raise HTTPException(status_code=304, detail="Hubo un error al escribir en la base de datos al actualizar")
+        raise HTTPException(status_code=500, detail="Hubo un error al escribir en la base de datos al actualizar")
