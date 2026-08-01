@@ -3,7 +3,6 @@ from typing import Optional
 
 class UserBase(BaseModel):
     username: str
-    password: str
     full_name: str
     email: str
     admin: int = 0 # Por defecto no son administradores
@@ -15,7 +14,15 @@ class UserUpdate(BaseModel):
     email: Optional[str] = None
     admin: Optional[int] = None
 
+class UserToken(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+class UserTokenData(BaseModel):
+    username: str
+
 class UserCreate(UserBase):
+    password: str
     pass
 
 class UserResponse(UserBase):
@@ -23,3 +30,4 @@ class UserResponse(UserBase):
 
     class Config:
         from_attributes = True
+

@@ -1,5 +1,6 @@
 from db.database import Session
 from db.schemas.user_schema import User # Obtiene el usuario a partir del cual se crearon las tablas
+from services.authentication_utils import verify_password
 
 class UserService:
     def __init__(self, db: Session) -> None:
@@ -32,6 +33,10 @@ class UserService:
     # Puede retornar None en caso que el usuario no se haya encontrado
     def get_user_id(self, user_id: int) -> User | None:
         return self._db.query(User).filter(User.id == user_id).first()
+
+    # Metodo para encontrar un usuario en base a su nombre de usuario, en vez de su id
+    def get_user_name(self, username: str) -> User | None:
+        return self._db.query(User).filter(User.username == username).first()
     
     # Definicion del metodo PUT
     def update_user(self, user_id: int, username: str, password: str, full_name: str,
@@ -67,3 +72,17 @@ class UserService:
         self._db.commit()
 
         return True
+
+    # Funcion para validar un usuario
+    def authenticate_user(self, username: str, password: str):
+        user = self.get_user_name(username)
+
+        if not user:
+            return None
+
+        if not verify_password(
+            normal_passwd=password,
+            hashed_passwd=user.password):
+            return None
+
+        return user

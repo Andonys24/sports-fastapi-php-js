@@ -1,2 +1,3 @@
-# Entrada para evitar subir los archivos de variables de entorno
+# Formatos de archivos generados en el entorno, y que no deben subirse
 .env
+.db
