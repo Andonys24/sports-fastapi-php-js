@@ -16,7 +16,14 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 if not DATABASE_URL:
     raise ValueError("No se encontro la URL para la conexion con la base de datos")
 
-engine_db = create_engine(DATABASE_URL) # Crea el motor de la base de datos en base a la sesion obtenida por la URL
+connect_args = {"check_same_thread": False}
+
+if DATABASE_URL.startswith('sqlite'):
+    # Crea el motor cuando en la URL se especifica que es una base de datos SQLite
+    engine_db = create_engine(DATABASE_URL, connect_args=connect_args) # Crea el motor de la base de datos en base a la sesion obtenida por la URL
+else:
+    # Crea un motor para otro tipo de bases de datos, como por ejemplo, postgres, MariaDB
+    engine_db = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(bind=engine_db, autocommit=False, autoflush=False) 
 Base = declarative_base()

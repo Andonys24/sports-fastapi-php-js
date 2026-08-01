@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Path, Body
 from models.user import UserCreate, UserUpdate, UserResponse
 from services.user_service import UserService
+from services.authentication_utils import hash_password
 from db.database import db_dependency
 
 # Se crea un nuevo router
-router = APIRouter()
+router = APIRouter(prefix="/users")
 
 # Funcion "fabrica" para obtener el servicio
 # db_dependency es un tipo de Session
@@ -13,18 +14,34 @@ def get_user_service(db_session: db_dependency) -> UserService:
 
 # Rutas
 # Metodo POST para la creacion de un nuevo usuario
-@router.post("/users", response_model=UserResponse, status_code=201)
+# Es decir, es tambien para el registro de usuarios
+@router.post("/", response_model=UserResponse, status_code=201)
 async def create_user(user_create: UserCreate, service: UserService = Depends(get_user_service)): # user es la clase del modelo Pydantic
-    return service.create_user(**user_create.model_dump()) # Retorna inmediatamente el usuario creado
+    previous_user = service.get_user_name(user_create.username)
+
+    # Valida si el usuario ya existe previamente buscando por medio del nombre de usuario
+    if previous_user:
+        raise HTTPException(status_code=400, detail="El nombre de usuario ya existe")
+
+    # En caso contrario, procede a crear un nuevo usuario
+    # Crea una contrasena cifrada con hash a partir de la contrasena en texto plano
+    password_hashed = hash_password(user_create.password)
+
+    # Retorna inmediatamente el usuario creado
+    return service.create_user(
+        password=password_hashed, # Se envia la contrasena encriptada por separado
+        # Se envian los demas atributos de un usuario, excluyendo password, debido a que ya fue enviada
+        **user_create.model_dump(exclude={"password"})) 
 
 # Metodo GET para obtener una cierta cantidad de usuarios
-@router.get("/users", response_model=list[UserResponse], status_code=200)
+@router.get("/", response_model=list[UserResponse], status_code=200)
 async def get_users(skip: int = 0, limit: int = 100, service: UserService = Depends(get_user_service)):
-    return service.get_users(skip, limit) # Retorna la lista de usuarios obtenidos
+     # Retorna la lista de usuarios obtenidos
+    return service.get_users(skip, limit)
 
 # Metodo GET para obtener un usuario en base a su id
-@router.get("/users/{id}", response_model=UserResponse, status_code=200)
-async def get_user_id(user_id: int, service: UserService = Depends(get_user_service)):
+@router.get("/{id}", response_model=UserResponse, status_code=200)
+async def get_user_id(user_id: int = Path(..., alias="id"), service: UserService = Depends(get_user_service)):
     user_finded = service.get_user_id(user_id)
     
     # Validacion en el caso que user_finded sea None, es decir, no se haya encontrado ninguna coincidencia
@@ -35,27 +52,39 @@ async def get_user_id(user_id: int, service: UserService = Depends(get_user_serv
     return user_finded
 
 # Metodo PUT para actualizar la configuracion de un usuario creado previamente
-@router.put("/users/{id}", response_model=UserResponse, status_code=200)
-async def update_user(id_user: int, user_update: UserUpdate, service: UserService = Depends(get_user_service)):
+@router.put("/{id}", response_model=UserResponse, status_code=200)
+async def update_user(id_user: int = Path(..., alias="id"), user_update: UserUpdate = Body(...), service: UserService = Depends(get_user_service)):
     try:
-        user_tmp = service.update_user(id_user, **user_update.model_dump())
+        # Solo si se envia una contrasena para actualizar, entonces crea una nueva contrasena encriptada
+        if user_update.password: 
+            new_password_hashed = hash_password(user_update.password)
 
+            user_tmp = service.update_user(
+                id_user, 
+                password=new_password_hashed, 
+                **user_update.model_dump(exclude={"password"}))
+            
+        # En caso contrario, password = None, por lo tanto no se asigno una contrasena para actualizar
+        else:
+            user_tmp = service.update_user(id_user, **user_update.model_dump())
+
+        # Validacion por si no se encontro el usuario
         if (not user_tmp):
             raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
         return user_tmp
-    except Exception as e:
-        raise HTTPException(status_code=304, detail="Hubo un error al escribir en la base de datos al actualizar")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Hubo un error al escribir en la base de datos al actualizar")
 
 # Metodo DELETE, simplemente para eliminar un usuario de la base de datos en base a su id
-@router.delete("/users/{id}", status_code=204)
-async def delete_user(id_user: int, service: UserService = Depends(get_user_service)):
+@router.delete("/{id}", status_code=200)
+async def delete_user(id_user: int = Path(..., alias="id"), service: UserService = Depends(get_user_service)):
     try:
         confirmation = service.delete_user(id_user)
 
         if (not confirmation):
             raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-        return {"success": True}
-    except Exception as e:
-        raise HTTPException(status_code=304, detail="Hubo un error al escribir en la base de datos al eliminar")
+        return {"resultado": True, "mensaje": "Usuario eliminado exitosamente"}
+    except Exception:
+        raise HTTPException(status_code=500, detail="Hubo un error al escribir en la base de datos al eliminar")
