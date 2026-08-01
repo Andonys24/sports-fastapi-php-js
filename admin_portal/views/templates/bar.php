@@ -18,6 +18,8 @@
         <a href="/purchases" class="boton">Ver Compras</a>
         <a href="/purchases/create" class="boton">Registrar Compra</a>
         <a href="/inventory" class="boton">Ver Inventario</a>
+        <a href="/invoices" class="boton">Ver Facturas</a>
+        <a href="/invoices/create" class="boton">Crear Factura</a>
         <a href="/admin" class="boton">Ver Encargos</a>
     </div>
 <?php endif; ?>

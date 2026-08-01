@@ -6,6 +6,7 @@ require_once __DIR__ . "/controllers/UserController.php";
 require_once __DIR__ . "/controllers/ProviderController.php";
 require_once __DIR__ . "/controllers/PurchaseController.php";
 require_once __DIR__ . "/controllers/InventoryController.php";
+require_once __DIR__ . "/controllers/InvoiceController.php";
 
 use MVC\Router;
 use Controllers\AuthController;
@@ -16,6 +17,7 @@ use Controllers\UserController;
 use Controllers\ProviderController;
 use Controllers\PurchaseController;
 use Controllers\InventoryController;
+use Controllers\InvoiceController;
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -76,6 +78,11 @@ $router->get('/inventory', [InventoryController::class, 'index']);
 $router->get('/inventory/update', [InventoryController::class, 'update']);
 $router->post('/inventory/update', [InventoryController::class, 'update']);
 $router->post('/inventory/delete', [InventoryController::class, 'delete']);
+
+// Facturas / ventas
+$router->get('/invoices', [InvoiceController::class, 'index']);
+$router->get('/invoices/create', [InvoiceController::class, 'create']);
+$router->post('/invoices/create', [InvoiceController::class, 'create']);
 
 // Ejecucion del Router
 $router->checkRoutes();
