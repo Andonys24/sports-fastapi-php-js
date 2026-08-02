@@ -16,6 +16,7 @@ use Controllers\UserController;
 use Controllers\SupplierController;
 use Controllers\PurchaseController;
 use Controllers\InventoryController;
+use Controllers\OrderController;
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -70,6 +71,9 @@ $router->post('/purchases/create', [PurchaseController::class, 'create']);
 
 // Inventario
 $router->get('/inventory', [InventoryController::class, 'index']);
+
+// Rutas de Encargos
+$router->get('/orders', [OrderController::class, 'index']);
 
 // Ejecucion del Router
 $router->checkRoutes();

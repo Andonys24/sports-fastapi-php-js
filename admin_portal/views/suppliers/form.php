@@ -24,7 +24,7 @@
         type="number"
         id="periodo_contrato"
         name="periodo_contrato"
-        placeholder="Periodo del contrato"
+        placeholder="Periodo del contrato en Meses"
         value="<?php echo s((string)($supplier['contract_period'] ?? '')); ?>">
 </div>
 

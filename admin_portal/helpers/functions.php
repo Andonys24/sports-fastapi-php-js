@@ -15,3 +15,14 @@ function isAdmin(): void
         exit;
     }
 }
+
+function filterByDate(array $items, string $dateKey, string $targetDate): array
+{
+    if (empty($targetDate)) {
+        return $items;
+    }
+
+    return array_values(array_filter($items, function ($item) use ($dateKey, $targetDate) {
+        return isset($item[$dateKey]) && $item[$dateKey] === $targetDate;
+    }));
+}

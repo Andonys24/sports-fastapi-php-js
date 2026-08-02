@@ -22,11 +22,7 @@ class PurchaseController extends BaseController
         // Si no viene parámetro fecha en la URL, se usa la fecha actual por defecto
         $fecha = trim((string) ($_GET['fecha'] ?? date('Y-m-d')));
 
-        if (!empty($fecha)) {
-            $purchases = array_values(array_filter($purchases, function ($item) use ($fecha) {
-                return isset($item['date_purchase']) && $item['date_purchase'] === $fecha;
-            }));
-        }
+        $purchases = filterByDate($purchases, "date_purchase", $fecha);
 
         $router->render('purchases/index', [
             'title'     => 'Historial de Compras',

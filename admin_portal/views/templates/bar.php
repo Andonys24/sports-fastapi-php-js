@@ -19,5 +19,6 @@
         <a href="/suppliers/create" class="boton">Agregar Proveedor</a>
         <a href="/purchases" class="boton">Ver Compras</a>
         <a href="/purchases/create" class="boton">Registrar Compra</a>
+        <a href="/orders" class="boton">Ver Ordenes</a>
     </div>
 <?php endif; ?>

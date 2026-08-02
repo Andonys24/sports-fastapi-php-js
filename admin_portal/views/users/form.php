@@ -28,11 +28,12 @@
         value="<?php echo s($user['email'] ?? ''); ?>">
 </div>
 
-<div class="campo">
+<div class="campo campo__password">
     <label for="password">Password</label>
     <input
         type="password"
         id="password"
         name="password"
-        placeholder="Contraseña del usuario">
+        placeholder="Contraseña nueva para el usuario (Opcional).">
+    <i class="fa-solid fa-eye eye-icon" id="eye-icon"></i>
 </div>

@@ -36,14 +36,18 @@
                     <p>Registrado Por: <span><?php echo s($purchase['username'] ?? 'N/A'); ?></span></p>
 
                     <h3>Detalle del Producto</h3>
-                    <p class="producto">Producto:
+                    <p>Producto:
                         <span><?php echo s($purchase['product_name'] ?? 'N/A'); ?></span>
                     </p>
-                    <p class="producto">Precio Unitario: L.
-                        <span><?php echo s(number_format($unitPrice, 2)) . ' X ' . s($quantity) . ' unidades'; ?></span>
+                    <p>Precio Unitario:
+                        <span>L. <?php echo s(number_format($unitPrice, 2)) . ' X ' . s($quantity) . ' unidades'; ?></span>
                     </p>
 
                     <p class="total">Total Invertido: <span>L. <?php echo s(number_format($totalPurchase, 2)); ?></span></p>
+
+                    <div class="reporte-acciones">
+                        <button type="button" class="boton-imprimir boton-guardar">Imprimir</button>
+                    </div>
                 </li>
             <?php endforeach; ?>
         </ul>
