@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Path
 from fastapi import Body
 from models.product import ProductCreate, ProductUpdate, ProductResponse
+from sqlalchemy.exc import IntegrityError
 from services.product_service import ProductService
 from db.database import db_dependency
 
@@ -12,7 +13,11 @@ def get_product_service(db_session: db_dependency) -> ProductService:
 # Rutas
 @router.post("/", response_model=ProductResponse, status_code=201)
 async def create_product(product_create: ProductCreate, service: ProductService = Depends(get_product_service)):
-    return service.create_product(**product_create.model_dump())
+    try:
+        return service.create_product(**product_create.model_dump())
+    # Tipo de excepcion cuando las ForeignKeys no son validas
+    except IntegrityError:
+        raise HTTPException(status_code=500, detail="Los id de categoria o de proveedor no existen")
 
 @router.get("/", response_model=list[ProductResponse], status_code=200)
 async def get_products(skip: int = 0, limit: int = 100, service: ProductService = Depends(get_product_service), ):

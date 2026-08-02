@@ -1,5 +1,5 @@
 from sqlalchemy import String, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from db.database import Base
 
 class Product(Base):
@@ -8,10 +8,16 @@ class Product(Base):
 
     # Columnas respectivas a la tabla de esta clase
     id: Mapped[int] = mapped_column(primary_key=True)
+
+    # Foreign Keys
     category_id: Mapped[int] = mapped_column(ForeignKey("categorias.id"))
-    provider_id: Mapped[int] = mapped_column(ForeignKey("proveedores.id"))
+    supplier_id: Mapped[int] = mapped_column(ForeignKey("proveedores.id"))
+
     name: Mapped[str] = mapped_column(String, index=True)
     price: Mapped[float] = mapped_column()
     brand: Mapped[str] = mapped_column(String, index=True)
     stock: Mapped[int] = mapped_column(default=0)  
     img_url: Mapped[str] = mapped_column(String, index=True)
+
+    category = relationship("Category", foreign_keys=[category_id])
+    supplier = relationship("Supplier", foreign_keys=[supplier_id])

@@ -27,7 +27,8 @@ async def get_category_id(category_id: int = Path(..., alias="id"), service: Cat
     return category
 
 @router.put("/{id}", response_model=CategoryResponse, status_code=200)
-async def update_category(category_id: int = Path(..., alias="id"), category_update: CategoryUpdate = Body(...), service: CategoryService = Depends(get_category_service)):
+async def update_category(category_id: int = Path(..., alias="id"), category_update: CategoryUpdate = Body(...), 
+        service: CategoryService = Depends(get_category_service)):
     try:
         category = service.update_category(category_id=category_id, **category_update.model_dump())
         

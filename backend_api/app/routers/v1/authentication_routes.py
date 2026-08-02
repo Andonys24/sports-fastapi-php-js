@@ -15,8 +15,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 def get_user_service(db_session: db_dependency) -> UserService:
     return UserService(db_session)
 
-async def get_current_user(token: str = Depends(oauth2_scheme), 
-        service: UserService = Depends(get_user_service)):
+async def get_current_user(token: str = Depends(oauth2_scheme), service: UserService = Depends(get_user_service)):
     try:
         if (not SECRET_KEY or not ALGORITHM):
             raise HTTPException(
@@ -51,8 +50,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme),
                 headers={"WWW-Authenticate": "Bearer"})
 
 @router.post("/login", response_model=UserToken)
-async def login(form_data: OAuth2PasswordRequestForm = Depends(), 
-        service: UserService = Depends(get_user_service)):
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), service: UserService = Depends(get_user_service)):
     user = service.authenticate_user(form_data.username, form_data.password)
 
     if not user:

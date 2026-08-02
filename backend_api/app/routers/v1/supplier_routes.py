@@ -15,7 +15,7 @@ async def create_supplier(supplier_create: SupplierCreate, service: SupplierServ
     return service.create_supplier(**supplier_create.model_dump())
 
 @router.get("/", response_model=list[SupplierResponse], status_code=200)
-async def get_suppliers(skip: int = 0, limit: int = 100, service: SupplierService = Depends(get_supplier_service), ):
+async def get_suppliers(skip: int = 0, limit: int = 100, service: SupplierService = Depends(get_supplier_service)):
     return service.get_suppliers(skip, limit)
 
 @router.get("/{id}", response_model=SupplierResponse, status_code=200)
@@ -28,7 +28,8 @@ async def get_supplier_id(supplier_id: int = Path(..., alias="id"), service: Sup
     return supplier
 
 @router.put("/{id}", response_model=SupplierResponse, status_code=200)
-async def update_supplier(supplier_id: int = Path(..., alias="id"), supplier_update: SupplierUpdate = Body(...), service: SupplierService = Depends(get_supplier_service)):
+async def update_supplier(supplier_id: int = Path(..., alias="id"), supplier_update: SupplierUpdate = Body(...), 
+        service: SupplierService = Depends(get_supplier_service)):
     try:
         supplier = service.update_supplier(supplier_id=supplier_id, **supplier_update.model_dump())
         

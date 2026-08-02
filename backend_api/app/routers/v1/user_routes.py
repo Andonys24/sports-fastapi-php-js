@@ -29,14 +29,15 @@ async def create_user(user_create: UserCreate, service: UserService = Depends(ge
 
     # Retorna inmediatamente el usuario creado
     return service.create_user(
-        password=password_hashed, # Se envia la contrasena encriptada por separado
+        # Se envia la contrasena encriptada por separado
+        password=password_hashed, 
         # Se envian los demas atributos de un usuario, excluyendo password, debido a que ya fue enviada
         **user_create.model_dump(exclude={"password"})) 
 
 # Metodo GET para obtener una cierta cantidad de usuarios
 @router.get("/", response_model=list[UserResponse], status_code=200)
 async def get_users(skip: int = 0, limit: int = 100, service: UserService = Depends(get_user_service)):
-     # Retorna la lista de usuarios obtenidos
+    # Retorna la lista de usuarios obtenidos
     return service.get_users(skip, limit)
 
 # Metodo GET para obtener un usuario en base a su id
@@ -53,20 +54,20 @@ async def get_user_id(user_id: int = Path(..., alias="id"), service: UserService
 
 # Metodo PUT para actualizar la configuracion de un usuario creado previamente
 @router.put("/{id}", response_model=UserResponse, status_code=200)
-async def update_user(id_user: int = Path(..., alias="id"), user_update: UserUpdate = Body(...), service: UserService = Depends(get_user_service)):
+async def update_user(id_user: int = Path(..., alias="id"), 
+        user_update: UserUpdate = Body(...), service: UserService = Depends(get_user_service)):
     try:
-        # Solo si se envia una contrasena para actualizar, entonces crea una nueva contrasena encriptada
-        if user_update.password: 
+        # Validacion en el caso que no se envie una contrasena
+        if (not user_update.password or user_update.password.strip() == ""):
+            user_tmp = service.update_user(id_user, **user_update.model_dump())
+        else:
+            # Crea una nueva contrasena encriptada solo cuando se proporcione una
             new_password_hashed = hash_password(user_update.password)
-
+            
             user_tmp = service.update_user(
                 id_user, 
                 password=new_password_hashed, 
                 **user_update.model_dump(exclude={"password"}))
-            
-        # En caso contrario, password = None, por lo tanto no se asigno una contrasena para actualizar
-        else:
-            user_tmp = service.update_user(id_user, **user_update.model_dump())
 
         # Validacion por si no se encontro el usuario
         if (not user_tmp):

@@ -11,5 +11,5 @@ class Supplier(Base):
     name: Mapped[str] = mapped_column(String, index=True)
     address: Mapped[str] = mapped_column(String, index=True)
     phone_number: Mapped[str] = mapped_column(String, index=True)
-    contract_period: Mapped[int] = mapped_column(Integer, index=True)
+    contract_period: Mapped[int] = mapped_column(Integer)
     contract_type: Mapped[str] = mapped_column(String, index=True)

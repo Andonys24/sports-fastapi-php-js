@@ -6,13 +6,13 @@ class ProductService:
         self._db = db
 
     # Definicion del metodo POST
-    def create_product(self, category_id: int, provider_id: int, name: str,
+    def create_product(self, category_id: int, supplier_id: int, name: str,
                 price: float, brand: str, stock: int,
                 img_url: str) -> Product:
         
         product = Product(
             category_id=category_id,
-            provider_id=provider_id,
+            supplier_id=supplier_id,
             name=name,
             price=price,
             brand=brand,
@@ -35,7 +35,7 @@ class ProductService:
         return self._db.query(Product).filter(Product.id == product_id).first()
     
     # Definicion del metodo PUT
-    def update_product(self, product_id: int, category_id: int, provider_id: int,
+    def update_product(self, product_id: int, category_id: int, supplier_id: int,
                     name: str, price: float, brand: str,
                     stock: int, img_url) -> Product | None:
         product = self.get_product_id(product_id)
@@ -44,7 +44,7 @@ class ProductService:
             return None
 
         product.category_id = category_id
-        product.provider_id = provider_id
+        product.supplier_id = supplier_id
         product.name = name
         product.price = price
         product.brand = brand
@@ -71,3 +71,15 @@ class ProductService:
         self._db.commit()
 
         return True
+
+    def update_product_stock(self, product_id: int, new_stock: int) -> None:
+        product = self.get_product_id(product_id)
+
+        # Validacion por si no se encontro el producto
+        if not product:
+            return None
+
+        product.stock = new_stock
+
+        self._db.commit()
+        self._db.refresh(product)
