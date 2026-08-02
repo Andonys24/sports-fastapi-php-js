@@ -3,7 +3,7 @@ require_once __DIR__ . "/config/config.php";
 require_once __DIR__ . "/autoload.php";
 require_once __DIR__ . "/helpers/functions.php";
 require_once __DIR__ . "/controllers/UserController.php";
-require_once __DIR__ . "/controllers/ProviderController.php";
+require_once __DIR__ . "/controllers/SupplierController.php";
 require_once __DIR__ . "/controllers/PurchaseController.php";
 require_once __DIR__ . "/controllers/InventoryController.php";
 
@@ -13,7 +13,7 @@ use Controllers\AdminController;
 use Controllers\ProductController;
 use Controllers\CategoryController;
 use Controllers\UserController;
-use Controllers\ProviderController;
+use Controllers\SupplierController;
 use Controllers\PurchaseController;
 use Controllers\InventoryController;
 
@@ -56,25 +56,20 @@ $router->post('/users/update', [UserController::class, 'update']);
 $router->post('/users/delete', [UserController::class, 'delete']);
 
 // CRUD de Proveedores
-$router->get('/suppliers', [ProviderController::class, 'index']);
-$router->get('/suppliers/create', [ProviderController::class, 'create']);
-$router->post('/suppliers/create', [ProviderController::class, 'create']);
-$router->get('/suppliers/update', [ProviderController::class, 'update']);
-$router->post('/suppliers/update', [ProviderController::class, 'update']);
-$router->post('/suppliers/delete', [ProviderController::class, 'delete']);
+$router->get('/suppliers', [SupplierController::class, 'index']);
+$router->get('/suppliers/create', [SupplierController::class, 'create']);
+$router->post('/suppliers/create', [SupplierController::class, 'create']);
+$router->get('/suppliers/update', [SupplierController::class, 'update']);
+$router->post('/suppliers/update', [SupplierController::class, 'update']);
+$router->post('/suppliers/delete', [SupplierController::class, 'delete']);
 
 // Compras para inventario
 $router->get('/purchases', [PurchaseController::class, 'index']);
 $router->get('/purchases/create', [PurchaseController::class, 'create']);
 $router->post('/purchases/create', [PurchaseController::class, 'create']);
-$router->get('/purchases/update', [PurchaseController::class, 'update']);
-$router->post('/purchases/update', [PurchaseController::class, 'update']);
-$router->post('/purchases/delete', [PurchaseController::class, 'delete']);
 
 // Inventario
 $router->get('/inventory', [InventoryController::class, 'index']);
-$router->get('/inventory/update', [InventoryController::class, 'update']);
-$router->post('/inventory/update', [InventoryController::class, 'update']);
 
 // Ejecucion del Router
 $router->checkRoutes();

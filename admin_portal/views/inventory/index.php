@@ -8,19 +8,16 @@
         <?php foreach ($inventory as $item) : ?>
             <?php
             if (!is_array($item)) continue;
-            $stock = (int)($item['stock'] ?? 0);
+            $stock = (int) ($item['stock'] ?? 0);
             $estadoClass = $stock === 0 ? 'agotado' : ($stock <= 5 ? 'bajo' : 'normal');
+            $precio = number_format((float) ($item['price'] ?? 0), 2);
             ?>
             <li>
-                <p>Producto: <span><?php echo s($item['product_name'] ?? ''); ?></span></p>
-                <p>Categoría: <span><?php echo s($item['category'] ?? 'Sin Categoría'); ?></span></p>
-                <p>Precio Venta: <span>L. <?php echo s($item['price'] ?? '0.00'); ?></span></p>
-                <p>Estado: <span><?php echo s($item['status'] ?? ($stock > 0 ? 'Disponible' : 'Agotado')); ?></span></p>
-                <p>Stock Disponible: <strong class="stock-badge <?php echo $estadoClass; ?>"><?php echo $stock; ?> unidades</strong></p>
-
-                <div class="acciones">
-                    <a class="boton-actualizar" href="/inventory/update?id=<?php echo s($item['product_id'] ?? ''); ?>">Ajustar Stock</a>
-                </div>
+                <p>Producto: <span><?php echo s($item['product_name'] ?? $item['name'] ?? ''); ?></span></p>
+                <p>Categoría: <span><?php echo s($item['category_name'] ?? $item['category'] ?? 'Sin Categoría'); ?></span></p>
+                <p>Precio Venta: <span>L. <?php echo s($precio); ?></span></p>
+                <p>Estado: <span><?php echo s($stock > 0 ? 'Disponible' : 'Agotado'); ?></span></p>
+                <p>Stock Disponible: <span class="stock-badge <?php echo $estadoClass; ?>"><?php echo $stock; ?> unidades</span></p>
             </li>
         <?php endforeach; ?>
     <?php else : ?>

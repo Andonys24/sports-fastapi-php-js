@@ -11,7 +11,7 @@
 <div class="campo">
     <label for="categoria">Categoría</label>
     <select name="categoria_id" id="categoria">
-        <option value="" disabled <?php echo empty($product['category_id'] ?? null) ? 'selected' : ''; ?>>-- Seleccionar --</option>
+        <option value="" disabled <?php echo empty($product['category_id'] ?? null) ? 'selected' : ''; ?>>-- Seleccionar Categoría --</option>
         <?php foreach ($categories ?? [] as $category) :
             $cat_id = $category['id'] ?? null;
             $selected_cat_id = $product['category_id'] ?? null;
@@ -39,11 +39,16 @@
 
 <div class="campo">
     <label for="proveedor">Proveedor</label>
-    <select name="provider_id" id="proveedor">
-        <option value="" disabled <?php echo empty($product['provider_id'] ?? null) ? 'selected' : ''; ?>>-- Seleccionar Proveedor --</option>
-        <?php foreach ($providers ?? [] as $provider) : ?>
-            <option value="<?php echo s($provider['id']); ?>" <?php echo (($product['provider_id'] ?? '') == $provider['id']) ? 'selected' : ''; ?>>
-                <?php echo s($provider['name']); ?>
+    <select name="supplier_id" id="proveedor">
+        <option value="" disabled <?php echo empty($product['supplier_id'] ?? null) ? 'selected' : ''; ?>>-- Seleccionar Proveedor --</option>
+        <?php foreach ($suppliers ?? [] as $supplier) :
+            $sup_id = $supplier['id'] ?? null;
+            $selected_sup_id = $product['supplier_id'] ?? null;
+        ?>
+            <option
+                <?php echo ((string)$selected_sup_id === (string)$sup_id) ? 'selected' : ''; ?>
+                value="<?php echo s($sup_id); ?>">
+                <?php echo s($supplier['name'] ?? ''); ?>
             </option>
         <?php endforeach; ?>
     </select>

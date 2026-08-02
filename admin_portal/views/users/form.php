@@ -15,7 +15,7 @@
         id="nombre"
         name="nombre"
         placeholder="Nombre completo del usuario"
-        value="<?php echo s($user['full_name'] ?? ''); ?>">
+        value="<?php echo s($user['full_name'] ?? $user['nombre'] ?? ''); ?>">
 </div>
 
 <div class="campo">
@@ -34,5 +34,5 @@
         type="password"
         id="password"
         name="password"
-        placeholder="Contraseña segura">
+        placeholder="Contraseña del usuario">
 </div>

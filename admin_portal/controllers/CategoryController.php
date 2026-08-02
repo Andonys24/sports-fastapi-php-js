@@ -5,30 +5,30 @@ namespace Controllers;
 use MVC\Router;
 use Services\ApiClient;
 
-class CategoryController
+class CategoryController extends BaseController
 {
-    public static function index(Router $router)
+    /**
+     * Listado de categorías
+     */
+    public static function index(Router $router): void
     {
         isAdmin();
 
         $api = new ApiClient();
-        $categories = $api->get('/categories') ?? [];
+        $categoriesList = $api->get('/categories') ?? [];
+
+        $categories = is_array($categoriesList) && array_is_list($categoriesList) ? $categoriesList : [];
 
         $router->render('categories/index', [
-            'title'     => 'Administrar Categorías',
+            'title'      => 'Administrar Categorías',
             'categories' => $categories
         ]);
     }
 
-    private static function getPayload(): array
-    {
-        return [
-            'name' => $_POST['nombre'] ?? '',
-            'description' => $_POST['descripcion'] ?? ''
-        ];
-    }
-
-    public static function create(Router $router)
+    /**
+     * Crear una nueva categoría
+     */
+    public static function create(Router $router): void
     {
         isAdmin();
 
@@ -45,21 +45,27 @@ class CategoryController
                 exit;
             }
 
-            $alerts['error'][] = $response['detail'] ?? $response['error'] ?? 'Error al crear la categoría';
+            $rawError = $response['detail'] ?? $response['error'] ?? 'Error al crear la categoría';
+            $alerts['error'][] = self::formatErrorMessage($rawError);
+
+            // Repoblar datos en caso de error
+            $category = self::populateFormData();
         }
 
         $router->render('categories/create', [
-            'title'   => 'Agregar Categoría',
+            'title'    => 'Agregar Categoría',
             'alerts'   => $alerts,
             'category' => $category
         ]);
     }
 
-    public static function update(Router $router)
+    /**
+     * Actualizar una categoría existente
+     */
+    public static function update(Router $router): void
     {
         isAdmin();
 
-        $alerts = [];
         $id = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
 
         if (!$id) {
@@ -67,17 +73,17 @@ class CategoryController
             exit;
         }
 
+        $alerts = [];
         $api = new ApiClient();
         $category = $api->get("/categories/{$id}");
 
-        if (!$category) {
+        if (!$category || isset($category['detail'])) {
             header('Location: /categories');
             exit;
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $payload = self::getPayload();
-
             $response = $api->put("/categories/{$id}", $payload);
 
             if ($response && !isset($response['detail']) && !isset($response['error'])) {
@@ -85,51 +91,61 @@ class CategoryController
                 exit;
             }
 
-            $alerts['error'][] = $response['detail'] ?? $response['error'] ?? 'Error al actualizar la categoría';
+            $rawError = $response['detail'] ?? $response['error'] ?? 'Error al actualizar la categoría';
+            $alerts['error'][] = self::formatErrorMessage($rawError);
+
+            // Preservar cambios intentados sobre los datos actuales
+            $category = self::populateFormData($category);
         }
 
         $router->render('categories/update', [
-            'title'   => 'Actualizar Categoría',
+            'title'    => 'Actualizar Categoría',
             'alerts'   => $alerts,
             'category' => $category
         ]);
     }
 
-    public static function delete()
+    /**
+     * Eliminar una categoría vía FETCH
+     */
+    public static function delete(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            isAdmin();
-
-            $id = $_POST['id'] ?? null;
-
-            header('Content-Type: application/json');
-
-            if (!$id) {
-                echo json_encode([
-                    'resultado' => false,
-                    'mensaje'   => 'ID de categoría no válido'
-                ]);
-                exit;
-            }
-
-            $api = new ApiClient();
-            $response = $api->delete("/categories/{$id}");
-
-            if ($response && !isset($response['detail']) && !isset($response['error'])) {
-                echo json_encode([
-                    'resultado' => true,
-                    'mensaje'   => 'Categoría Eliminada Exitosamente'
-                ]);
-            } else {
-                $rawError = $response['detail'] ?? $response['error'] ?? 'Error al eliminar la categoría';
-                $errorMessage = is_array($rawError) ? ($rawError[0]['msg'] ?? json_encode($rawError)) : $rawError;
-
-                echo json_encode([
-                    'resultado' => false,
-                    'mensaje'   => is_string($errorMessage) ? $errorMessage : 'Error desconocido en la API'
-                ]);
-            }
-            exit;
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return;
         }
+
+        isAdmin();
+
+        $id = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
+
+        if (!$id) {
+            self::jsonResponse(false, 'ID de categoría no válido', 400);
+        }
+
+        $api = new ApiClient();
+        $response = $api->delete("/categories/{$id}");
+
+        if ($response && !isset($response['detail']) && !isset($response['error'])) {
+            self::jsonResponse(true, 'Categoría Eliminada Exitosamente');
+        }
+
+        $rawError = $response['detail'] ?? $response['error'] ?? 'Error al eliminar la categoría';
+        self::jsonResponse(false, self::formatErrorMessage($rawError), 400);
+    }
+
+    protected static function getPayload(array $extraData = []): array
+    {
+        return [
+            'name'        => trim((string) ($_POST['nombre'] ?? '')),
+            'description' => trim((string) ($_POST['descripcion'] ?? '')),
+        ];
+    }
+
+    protected static function populateFormData(array $default = []): array
+    {
+        return array_merge($default, [
+            'name'        => $_POST['nombre'] ?? $default['name'] ?? '',
+            'description' => $_POST['descripcion'] ?? $default['description'] ?? '',
+        ]);
     }
 }

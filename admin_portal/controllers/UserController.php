@@ -5,17 +5,22 @@ namespace Controllers;
 use MVC\Router;
 use Services\ApiClient;
 
-class UserController
+class UserController extends BaseController
 {
-    public static function index(Router $router)
+    /**
+     * Listado de usuarios (clientes / no administradores)
+     */
+    public static function index(Router $router): void
     {
         isAdmin();
 
         $api = new ApiClient();
-        $users = $api->get("/users") ?? [];
-        $users = array_filter($users, function ($user) {
+        $usersResponse = $api->get('/users') ?? [];
+
+        // Filtrar usuarios no administradores y reindexar el arreglo
+        $users = array_values(array_filter($usersResponse, function ($user) {
             return ($user['admin'] ?? 0) != 1;
-        });
+        }));
 
         $router->render('users/index', [
             'title' => 'Usuarios',
@@ -23,18 +28,10 @@ class UserController
         ]);
     }
 
-    private static function getPayload(): array
-    {
-        return [
-            'username'  => $_POST['username'] ?? '',
-            'full_name' => $_POST['nombre'] ?? '',
-            'email'     => $_POST['email'] ?? '',
-            'password'  => $_POST['password'] ?? '',
-            'admin'     => 0 // <--- Forzado por convención a 0 (usuario normal/cliente)
-        ];
-    }
-
-    public static function create(Router $router)
+    /**
+     * Crear un nuevo usuario
+     */
+    public static function create(Router $router): void
     {
         isAdmin();
 
@@ -44,37 +41,34 @@ class UserController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $payload = self::getPayload();
             $api = new ApiClient();
-            $response = $api->post("/users", $payload);
+            $response = $api->post('/users', $payload);
 
             if ($response && !isset($response['detail']) && !isset($response['error'])) {
                 header('Location: /users');
                 exit;
             }
 
-            // Capturar error de forma segura (igual que en productos)
             $rawError = $response['detail'] ?? $response['error'] ?? 'Error al crear el usuario';
+            $alerts['error'][] = self::formatErrorMessage($rawError);
 
-            if (is_array($rawError)) {
-                $errorMessage = $rawError[0]['msg'] ?? json_encode($rawError);
-            } else {
-                $errorMessage = $rawError;
-            }
-
-            $alerts['error'][] = is_string($errorMessage) ? $errorMessage : 'Error desconocido en la API';
+            // Repoblar formulario en caso de error
+            $user = self::populateFormData();
         }
 
         $router->render('users/create', [
-            'title' => 'Nuevo Usuario',
+            'title'  => 'Nuevo Usuario',
             'alerts' => $alerts,
-            'user' => $user
+            'user'   => $user
         ]);
     }
 
-    public static function update(Router $router)
+    /**
+     * Actualizar un usuario existente
+     */
+    public static function update(Router $router): void
     {
         isAdmin();
 
-        $alerts = [];
         $id = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
 
         if (!$id) {
@@ -82,12 +76,17 @@ class UserController
             exit;
         }
 
+        $alerts = [];
         $api = new ApiClient();
         $user = $api->get("/users/{$id}");
 
+        if (!$user || isset($user['detail']) || isset($user['error'])) {
+            header('Location: /users');
+            exit;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $payload = self::getPayload();
-
             $response = $api->put("/users/{$id}", $payload);
 
             if ($response && !isset($response['detail']) && !isset($response['error'])) {
@@ -95,60 +94,66 @@ class UserController
                 exit;
             }
 
-            // Capturar error de forma segura
             $rawError = $response['detail'] ?? $response['error'] ?? 'Error al actualizar el usuario';
+            $alerts['error'][] = self::formatErrorMessage($rawError);
 
-            if (is_array($rawError)) {
-                $errorMessage = $rawError[0]['msg'] ?? json_encode($rawError);
-            } else {
-                $errorMessage = $rawError;
-            }
-
-            $alerts['error'][] = is_string($errorMessage) ? $errorMessage : 'Error desconocido en la API';
+            // Preservar datos intentados tras un error
+            $user = self::populateFormData($user);
         }
 
         $router->render('users/update', [
-            'title' => 'Actualizar Usuario',
+            'title'  => 'Actualizar Usuario',
             'alerts' => $alerts,
-            'user' => $user
+            'user'   => $user
         ]);
     }
 
-    public static function delete()
+    /**
+     * Eliminar un usuario vía FETCH
+     */
+    public static function delete(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            isAdmin();
-
-            $id = $_POST['id'] ?? null;
-
-            header('Content-Type: application/json');
-
-            if (!$id) {
-                echo json_encode([
-                    'resultado' => false,
-                    'mensaje'   => 'ID de usuario no válido'
-                ]);
-                exit;
-            }
-
-            $api = new ApiClient();
-            $response = $api->delete("/users/{$id}");
-
-            if ($response && !isset($response['detail']) && !isset($response['error'])) {
-                echo json_encode([
-                    'resultado' => true,
-                    'mensaje'   => 'Usuario Eliminado Exitosamente'
-                ]);
-            } else {
-                $rawError = $response['detail'] ?? $response['error'] ?? 'Error al eliminar el usuario';
-                $errorMessage = is_array($rawError) ? ($rawError[0]['msg'] ?? json_encode($rawError)) : $rawError;
-
-                echo json_encode([
-                    'resultado' => false,
-                    'mensaje'   => is_string($errorMessage) ? $errorMessage : 'Error desconocido en la API'
-                ]);
-            }
-            exit;
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return;
         }
+
+        isAdmin();
+
+        $id = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
+
+        if (!$id) {
+            self::jsonResponse(false, 'ID de usuario no válido', 400);
+        }
+
+        $api = new ApiClient();
+        $response = $api->delete("/users/{$id}");
+
+        if ($response && !isset($response['detail']) && !isset($response['error'])) {
+            self::jsonResponse(true, 'Usuario Eliminado Exitosamente');
+        }
+
+        $rawError = $response['detail'] ?? $response['error'] ?? 'Error al eliminar el usuario';
+        self::jsonResponse(false, self::formatErrorMessage($rawError), 400);
+    }
+
+    protected static function getPayload(array $extraData = []): array
+    {
+        return [
+            'username'  => trim((string) ($_POST['username'] ?? '')),
+            'full_name' => trim((string) ($_POST['nombre'] ?? '')),
+            'email'     => trim((string) ($_POST['email'] ?? '')),
+            'password'  => $_POST['password'] ?? '',
+            'admin'     => 0 // Convención: usuario estándar
+        ];
+    }
+
+    protected static function populateFormData(array $default = []): array
+    {
+        return array_merge($default, [
+            'username'  => $_POST['username'] ?? $default['username'] ?? '',
+            'full_name' => $_POST['nombre'] ?? $default['full_name'] ?? $default['nombre'] ?? '',
+            'email'     => $_POST['email'] ?? $default['email'] ?? '',
+            'password'  => $_POST['password'] ?? '',
+        ]);
     }
 }

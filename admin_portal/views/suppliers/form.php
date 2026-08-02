@@ -5,7 +5,7 @@
         id="nombre"
         name="nombre"
         placeholder="Nombre del proveedor"
-        value="<?php echo s($provider['name'] ?? ''); ?>">
+        value="<?php echo s($supplier['name'] ?? ''); ?>">
 </div>
 
 <div class="campo">
@@ -15,7 +15,7 @@
         id="telefono"
         name="telefono"
         placeholder="Teléfono del proveedor"
-        value="<?php echo s($provider['phone_number'] ?? ''); ?>">
+        value="<?php echo s($supplier['phone_number'] ?? ''); ?>">
 </div>
 
 <div class="campo">
@@ -25,7 +25,7 @@
         id="periodo_contrato"
         name="periodo_contrato"
         placeholder="Periodo del contrato"
-        value="<?php echo s((string)($provider['contract_period'] ?? '')); ?>">
+        value="<?php echo s((string)($supplier['contract_period'] ?? '')); ?>">
 </div>
 
 <div class="campo">
@@ -35,7 +35,7 @@
         id="tipo_contrato"
         name="tipo_contrato"
         placeholder="Tipo de contrato"
-        value="<?php echo s($provider['contract_type'] ?? ''); ?>">
+        value="<?php echo s($supplier['contract_type'] ?? ''); ?>">
 </div>
 
 <div class="campo">
@@ -43,5 +43,5 @@
     <textarea
         id="direccion"
         name="direccion"
-        placeholder="Dirección del proveedor"><?php echo s($provider['address'] ?? ''); ?></textarea>
+        placeholder="Dirección del proveedor"><?php echo s($supplier['address'] ?? ''); ?></textarea>
 </div>

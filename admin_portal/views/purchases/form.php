@@ -1,55 +1,57 @@
 <div class="campo">
-    <label for="product_id">Producto</label>
+    <label for="product_id">Producto:</label>
     <select name="product_id" id="product_id">
-        <option value="" disabled <?php echo empty($purchase['product_id'] ?? null) ? 'selected' : ''; ?>>-- Seleccionar Producto --</option>
+        <option value="">-- Seleccione --</option>
         <?php foreach ($products ?? [] as $product) : ?>
-            <option value="<?php echo s($product['id']); ?>" <?php echo (($purchase['product_id'] ?? '') == $product['id']) ? 'selected' : ''; ?>>
-                <?php echo s($product['name']); ?>
+            <option
+                value="<?php echo s($product['id']); ?>"
+                <?php echo (string)($purchase['product_id'] ?? '') === (string)$product['id'] ? 'selected' : ''; ?>>
+                <?php echo s($product['name'] ?? $product['nombre'] ?? ''); ?>
             </option>
         <?php endforeach; ?>
     </select>
 </div>
 
 <div class="campo">
-    <label for="provider_id">Proveedor</label>
-    <select name="provider_id" id="provider_id">
-        <option value="" disabled <?php echo empty($purchase['provider_id'] ?? $purchase['supplier_id'] ?? null) ? 'selected' : ''; ?>>-- Seleccionar Proveedor --</option>
-        <?php foreach ($providers ?? [] as $provider) : ?>
-            <option value="<?php echo s($provider['id']); ?>" <?php echo ((($purchase['provider_id'] ?? $purchase['supplier_id'] ?? '') == $provider['id'])) ? 'selected' : ''; ?>>
-                <?php echo s($provider['name']); ?>
+    <label for="supplier_id">Proveedor:</label>
+    <select name="supplier_id" id="supplier_id">
+        <option value="">-- Seleccione --</option>
+        <?php foreach ($suppliers ?? [] as $supplier) : ?>
+            <option
+                value="<?php echo s($supplier['id']); ?>"
+                <?php echo (string)($purchase['supplier_id'] ?? '') === (string)$supplier['id'] ? 'selected' : ''; ?>>
+                <?php echo s($supplier['name'] ?? $supplier['nombre'] ?? ''); ?>
             </option>
         <?php endforeach; ?>
     </select>
 </div>
 
 <div class="campo">
-    <label for="quantity">Cantidad</label>
+    <label for="quantity">Cantidad:</label>
     <input
         type="number"
         id="quantity"
-        placeholder="Cantidad de unidades"
         name="quantity"
-        min="1"
-        value="<?php echo s($purchase['quantity'] ?? 1); ?>">
+        placeholder="Ej. 10"
+        value="<?php echo s($purchase['quantity'] ?? ''); ?>">
 </div>
 
 <div class="campo">
-    <label for="purchase_price">Precio de Compra (L.)</label>
+    <label for="purchase_price">Precio de Compra (L.):</label>
     <input
         type="number"
-        id="purchase_price"
-        placeholder="Costo unitario de compra"
-        name="purchase_price"
-        value="<?php echo s($purchase['purchase_price'] ?? ''); ?>"
         step="0.01"
-        min="0">
+        id="purchase_price"
+        name="purchase_price"
+        placeholder="Ej. 150.00"
+        value="<?php echo s($purchase['purchase_price'] ?? ''); ?>">
 </div>
 
 <div class="campo">
-    <label for="date">Fecha de Compra</label>
+    <label for="date_purchase">Fecha de Compra:</label>
     <input
         type="date"
-        id="date"
-        name="date"
-        value="<?php echo s($purchase['date'] ?? date('Y-m-d')); ?>">
+        id="date_purchase"
+        name="date_purchase"
+        value="<?php echo s($purchase['date_purchase'] ?? date('Y-m-d')); ?>">
 </div>

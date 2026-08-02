@@ -5,57 +5,58 @@ namespace Controllers;
 use MVC\Router;
 use Services\ApiClient;
 
-class PurchaseController
+class PurchaseController extends BaseController
 {
-    public static function index(Router $router)
+    /**
+     * Muestra el historial de compras filtrado por fecha (hoy por defecto)
+     */
+    public static function index(Router $router): void
     {
         isAdmin();
 
-        // 1. Validar y formatear la fecha recibida por GET (por defecto hoy)
-        $fecha = $_GET['fecha'] ?? date('Y-m-d');
-        $fechas = explode('-', $fecha);
-
-        // Si la fecha enviada no es válida (ej: 2026-02-31), redirigimos a la fecha actual
-        if (count($fechas) !== 3 || !checkdate((int)$fechas[1], (int)$fechas[2], (int)$fechas[0])) {
-            $fecha = date('Y-m-d');
-        }
-
-        // 2. Consumir la API pasando la fecha filtrada
         $api = new ApiClient();
-        $response = $api->get("/purchases?fecha={$fecha}");
+        $response = $api->get('/purchases');
 
-        // Aseguramos que sea una lista/arreglo válido
         $purchases = (is_array($response) && array_is_list($response)) ? $response : [];
 
-        // 3. Renderizar la vista
+        // Si no viene parámetro fecha en la URL, se usa la fecha actual por defecto
+        $fecha = trim((string) ($_GET['fecha'] ?? date('Y-m-d')));
+
+        if (!empty($fecha)) {
+            $purchases = array_values(array_filter($purchases, function ($item) use ($fecha) {
+                return isset($item['date_purchase']) && $item['date_purchase'] === $fecha;
+            }));
+        }
+
         $router->render('purchases/index', [
-            'title'     => 'Administración de Compras',
-            'fecha'     => $fecha,
-            'purchases' => $purchases
+            'title'     => 'Historial de Compras',
+            'purchases' => $purchases,
+            'fecha'     => $fecha
         ]);
     }
 
-    private static function getPayload(): array
-    {
-        return [
-            'product_id'     => (int) ($_POST['product_id'] ?? 0),
-            'provider_id'    => (int) ($_POST['provider_id'] ?? 0),
-            'quantity'       => (int) ($_POST['quantity'] ?? 0),
-            'purchase_price' => (float) ($_POST['purchase_price'] ?? 0),
-            'date'           => $_POST['date'] ?? date('Y-m-d')
-        ];
-    }
-
-    public static function create(Router $router)
+    /**
+     * Registrar una nueva compra
+     */
+    public static function create(Router $router): void
     {
         isAdmin();
 
         $alerts = [];
-        $purchase = [];
         $api = new ApiClient();
-        $products = $api->get("/products") ?? [];
-        $providersResponse = $api->get('/suppliers');
-        $providers = is_array($providersResponse) && array_is_list($providersResponse) ? $providersResponse : [];
+
+        $products = $api->get('/products') ?? [];
+        $suppliersResponse = $api->get('/suppliers');
+        $suppliers = (is_array($suppliersResponse) && array_is_list($suppliersResponse)) ? $suppliersResponse : [];
+
+        // Estructura por defecto para evitar warnings de claves no definidas
+        $purchase = [
+            'product_id'     => '',
+            'supplier_id'    => '',
+            'quantity'       => '',
+            'purchase_price' => '',
+            'date_purchase'  => date('Y-m-d')
+        ];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $payload = self::getPayload();
@@ -68,101 +69,48 @@ class PurchaseController
             }
 
             $rawError = $response['detail'] ?? $response['error'] ?? 'Error al registrar la compra';
+            $alerts['error'][] = self::formatErrorMessage($rawError);
 
-            if (is_array($rawError)) {
-                $errorMessage = $rawError[0]['msg'] ?? json_encode($rawError);
-            } else {
-                $errorMessage = $rawError;
-            }
-
-            $alerts['error'][] = is_string($errorMessage) ? $errorMessage : 'Error desconocido en la API';
-            $purchase = $payload;
+            $purchase = self::populateFormData();
         }
 
         $router->render('purchases/create', [
             'title'     => 'Nueva Compra',
             'alerts'    => $alerts,
             'products'  => $products,
-            'providers' => $providers,
+            'suppliers' => $suppliers,
             'purchase'  => $purchase,
         ]);
     }
 
-    public static function update(Router $router)
+    protected static function getPayload(array $extraData = []): array
     {
-        isAdmin();
+        $userId = $_SESSION['id'] ?? $_SESSION['user_id'] ?? 1;
 
-        $alerts = [];
-        $id = filter_var($_GET["id"] ?? null, FILTER_VALIDATE_INT);
-
-        if (!$id) {
-            header("Location: /purchases");
-            exit;
-        }
-
-        $api = new ApiClient();
-        $purchase = $api->get("/purchases/{$id}");
-        $products = $api->get("/products") ?? [];
-        $providersResponse = $api->get('/suppliers');
-        $providers = is_array($providersResponse) && array_is_list($providersResponse) ? $providersResponse : [];
-
-        if (!$purchase || isset($purchase['detail'])) {
-            header('Location: /purchases');
-            exit;
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $payload = self::getPayload();
-
-            $response = $api->put("/purchases/{$id}", $payload);
-
-            if ($response && !isset($response['detail']) && !isset($response['error'])) {
-                header('Location: /purchases');
-                exit;
-            }
-
-            $rawError = $response['detail'] ?? $response['error'] ?? 'Error al actualizar la compra';
-
-            if (is_array($rawError)) {
-                $errorMessage = $rawError[0]['msg'] ?? json_encode($rawError);
-            } else {
-                $errorMessage = $rawError;
-            }
-
-            $alerts['error'][] = is_string($errorMessage) ? $errorMessage : 'Error al actualizar la compra';
-        }
-
-        $router->render('purchases/update', [
-            'title'     => 'Actualizar Compra',
-            'alerts'    => $alerts,
-            'purchase'  => $purchase,
-            'products'  => $products,
-            'providers' => $providers,
-        ]);
+        return [
+            'product_id'     => (int) ($_POST['product_id'] ?? 0),
+            'supplier_id'    => (int) ($_POST['supplier_id'] ?? 0),
+            'user_id'        => (int) $userId,
+            'quantity'       => (int) ($_POST['quantity'] ?? 0),
+            'purchase_price' => (float) ($_POST['purchase_price'] ?? 0.0),
+            'date_purchase'  => trim((string) ($_POST['date_purchase'] ?? date('Y-m-d'))),
+        ];
     }
 
-    public static function delete()
+    protected static function populateFormData(array $default = []): array
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            isAdmin();
-
-            $api = new ApiClient();
-            $id = $_POST['id'] ?? null;
-            $response = $api->delete("/purchases/{$id}");
-
-            header('Content-Type: application/json');
-            if ($response && !isset($response['detail']) && !isset($response['error'])) {
-                echo json_encode([
-                    'resultado' => true,
-                    'mensaje'   => 'Registro de Compra Eliminado Exitosamente'
-                ]);
-            } else {
-                echo json_encode([
-                    'resultado' => false,
-                    'mensaje'   => $response['detail'] ?? $response['error'] ?? 'Error al eliminar la compra'
-                ]);
-            }
-            exit;
-        }
+        return array_merge([
+            'product_id'     => '',
+            'supplier_id'    => '',
+            'quantity'       => '',
+            'purchase_price' => '',
+            'date_purchase'  => date('Y-m-d'),
+        ], $default, [
+            'product_id'     => $_POST['product_id'] ?? $default['product_id'] ?? '',
+            'supplier_id'    => $_POST['supplier_id'] ?? $default['supplier_id'] ?? '',
+            'quantity'       => $_POST['quantity'] ?? $default['quantity'] ?? '',
+            'purchase_price' => $_POST['purchase_price'] ?? $default['purchase_price'] ?? '',
+            'date_purchase'  => $_POST['date_purchase'] ?? $default['date_purchase'] ?? date('Y-m-d'),
+        ]);
     }
 }
