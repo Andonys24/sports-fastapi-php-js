@@ -35,13 +35,16 @@ class InvoiceService:
         if product_tmp.stock < invoice.quantity:
             return None
 
+        # En caso contrario, procede a realizar los respectivos cambios en la base de
         self._db.add(invoice)
         self._db.commit()
         self._db.refresh(invoice)
 
         # En caso que se haya agregado correctamente la factura, se procede a disminuir el stock del producto
         new_stock = product_tmp.stock - invoice.quantity
-        product_service.update_product_stock(invoice.product_id, new_stock)
+
+        # Aplica el cambio de stock al producto
+        product_service.update_product_stock(product=product_tmp, new_stock=new_stock)
 
         return invoice
 

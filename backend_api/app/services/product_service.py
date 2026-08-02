@@ -72,13 +72,9 @@ class ProductService:
 
         return True
 
-    def update_product_stock(self, product_id: int, new_stock: int) -> None:
-        product = self.get_product_id(product_id)
-
-        # Validacion por si no se encontro el producto
-        if not product:
-            return None
-
+    # Esta funcion recibe un producto completo, para garantizar que este sera el que tendra el cambio de stock
+    def update_product_stock(self, product: Product, new_stock: int) -> None:
+        # Actualiza inmediatamente el stock, asi como aplica los cambios en la base de datos
         product.stock = new_stock
 
         self._db.commit()

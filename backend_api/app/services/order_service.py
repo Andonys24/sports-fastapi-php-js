@@ -1,7 +1,9 @@
 from sqlalchemy import Row
 from sqlalchemy.orm import Session
+from db.schemas.invoice_schema import Invoice
 from db.schemas.order_schema import Order
 from db.schemas.user_schema import User
+from db.schemas.product_schema import Product
 from datetime import date, time
 
 class OrderService:
@@ -10,8 +12,8 @@ class OrderService:
         self._db = db
 
     # Metodo especificos
-    def create_order(self, user_id: int, address: str, time_order: time,
-            date_order: date, total: float) -> Order:
+    def create_order(self, user_id: int, address: str, time_order: time, date_order: date, 
+            total: float) -> Order:
         order = Order(
             user_id=user_id,
             address=address,
@@ -46,6 +48,22 @@ class OrderService:
             return None
 
         return order
+
+    # Metodo para obtener una orden dependiendo del dia, en el cual se realiza un JOIN de las tablas
+    # Invoice, Order y User
+    def get_orders_date(self, date_order: date) -> list[Row] | None:
+        return self._db.query(
+            Order.id.label("order_id"),
+            Order.time_order.label("time"),
+            User.username.label("client"),
+            User.email.label("email"),
+            Order.address.label("address"),
+            Product.name.label("product"),
+            Invoice.price.label("price"),
+            Invoice.quantity.label("quantity")
+        ).join(Order, User.id == Order.user_id
+        ).join(Invoice, Product.id == Invoice.product_id,
+        ).filter(Order.date_order == date_order).all()
 
     def delete_order(self, order_id: int) -> bool:
         order = self._db.query(Order).filter(Order.id == order_id).first()

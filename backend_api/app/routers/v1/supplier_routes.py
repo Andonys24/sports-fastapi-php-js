@@ -3,6 +3,7 @@ from fastapi import Body
 from models.supplier import SupplierCreate, SupplierUpdate, SupplierResponse
 from services.supplier_service import SupplierService
 from db.database import db_dependency
+from sqlalchemy.exc import IntegrityError
 
 router = APIRouter(prefix="/suppliers")
 
@@ -49,5 +50,5 @@ async def delete_supplier(supplier_id: int = Path(..., alias="id"), service: Sup
             raise HTTPException(status_code=404, detail="Proveedor no encontrado")
 
         return {"resultado": True, "mensaje": "Proveedor eliminado exitosamente"}
-    except Exception:
-        raise HTTPException(status_code=500, detail="Hubo un error al escribir en la base de datos al actualizar")
+    except IntegrityError:
+        raise HTTPException(status_code=500, detail="No se puede borrar el registro, debido a que esta relacionado a otras tablas")

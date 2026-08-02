@@ -53,5 +53,5 @@ async def delete_product(product_id: int = Path(..., alias="id"), service: Produ
             raise HTTPException(status_code=404, detail="Producto no encontrado")
 
         return {"resultado": True, "mensaje": "Producto eliminado exitosamente"}
-    except Exception:
-        raise HTTPException(status_code=500, detail="Hubo un error al escribir en la base de datos al actualizar")
+    except IntegrityError:
+        raise HTTPException(status_code=500, detail="No se puede borrar el registro, debido a que esta relacionado a otras tablas")

@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from db.database import engine_db, Base
-from routers.v1 import user_routes, product_routes, category_routes, supplier_routes
-from routers.v1 import authentication_routes, purchase_routes, order_routes, invoice_routes
+from routers.v1 import user_routes, product_routes, category_routes, supplier_routes, authentication_routes
+from routers.v1 import purchase_routes, order_routes, invoice_routes, inventory_routes
 
 Base.metadata.create_all(bind=engine_db)
 
@@ -29,3 +29,4 @@ app.include_router(supplier_routes.router, prefix="/api/v1", tags=["Suppliers"])
 app.include_router(purchase_routes.router, prefix="/api/v1", tags=["Compras"])
 app.include_router(order_routes.router, prefix="/api/v1", tags=["Encargos"])
 app.include_router(invoice_routes.router, prefix="/api/v1", tags=["Facturas"])
+app.include_router(inventory_routes.router, prefix="/api/v1", tags=["Inventario"])

@@ -51,5 +51,5 @@ async def delete_invoice(invoice_id: int, service: InvoiceService = Depends(get_
             raise HTTPException(status_code=404, detail="No se encontro la factura")
 
         return {"resultado": True, "mensaje": "Factura eliminada correctamente"}
-    except Exception:
-        raise HTTPException(status_code=500, detail="Hubo un error al escribir en la base de datos")
+    except IntegrityError:
+        raise HTTPException(status_code=500, detail="No se puede borrar el registro, debido a que esta relacionado a otras tablas")

@@ -8,6 +8,19 @@ class OrderBase(BaseModel):
     date_order: date = date.today()
     total: float
 
+class OrderDaily(BaseModel):
+    order_id: int
+    time: time
+    client: str
+    email: str
+    address: str
+    product: str
+    price: float
+    quantity: float
+
+    class Config:
+        from_attributes = True
+
 class OrderCreate(OrderBase):
     pass
 

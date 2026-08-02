@@ -3,6 +3,7 @@ from models.user import UserCreate, UserUpdate, UserResponse
 from services.user_service import UserService
 from services.authentication_utils import hash_password
 from db.database import db_dependency
+from sqlalchemy.exc import IntegrityError
 
 # Se crea un nuevo router
 router = APIRouter(prefix="/users")
@@ -78,8 +79,8 @@ async def update_user(id_user: int = Path(..., alias="id"),
         raise HTTPException(status_code=500, detail="Hubo un error al escribir en la base de datos al actualizar")
 
 # Metodo DELETE, simplemente para eliminar un usuario de la base de datos en base a su id
-@router.delete("/{id}", status_code=200)
-async def delete_user(id_user: int = Path(..., alias="id"), service: UserService = Depends(get_user_service)):
+@router.delete("/{id_user}", status_code=200)
+async def delete_user(id_user: int, service: UserService = Depends(get_user_service)):
     try:
         confirmation = service.delete_user(id_user)
 
@@ -87,5 +88,5 @@ async def delete_user(id_user: int = Path(..., alias="id"), service: UserService
             raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
         return {"resultado": True, "mensaje": "Usuario eliminado exitosamente"}
-    except Exception:
-        raise HTTPException(status_code=500, detail="Hubo un error al escribir en la base de datos al eliminar")
+    except IntegrityError:
+        raise HTTPException(status_code=500, detail="No se puede borrar el registro, debido a que esta relacionado a otras tablas")

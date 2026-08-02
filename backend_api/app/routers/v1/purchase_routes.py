@@ -48,5 +48,5 @@ async def delete_purchase(purchase_id: int, service: PurchaseService = Depends(g
             raise HTTPException(status_code=404, detail="Compra no encontrada")
 
         return {"resultado": True, "mensaje": "Compra eliminada exitosamente"}
-    except Exception:
-        raise HTTPException(status_code=500, detail="Hubo un error al escribir en la base de datos")
+    except IntegrityError:
+        raise HTTPException(status_code=500, detail="No se puede borrar el registro, debido a que esta relacionado a otras tablas")

@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends
-from models.order import OrderCreate, OrderResponse, OrderJoinedResponse
+from models.order import OrderCreate, OrderResponse, OrderJoinedResponse, OrderDaily
 from services.order_service import OrderService
 from db.database import db_dependency
 from sqlalchemy.exc import IntegrityError
+from datetime import date
 
 router = APIRouter(prefix="/orders")
 
@@ -40,5 +41,16 @@ async def delete_order(order_id: int, service: OrderService = Depends(get_order_
             raise HTTPException(status_code=404, detail="No se encontro la orden")
 
         return {"resultado": True, "mensaje": "Orden eliminada"}
-    except Exception:
-        raise HTTPException(status_code=500, detail="Hubo un error al escribir en la base de datos")
+    except IntegrityError:
+        raise HTTPException(status_code=500, detail="No se puede borrar el registro, debido a que esta relacionado a otras tablas")
+
+@router.get("/daily/{date_order}", response_model=list[OrderDaily], status_code=200)
+async def get_daily_order(service: OrderService = Depends(get_order_service)):
+    # Obtiene los encargos del dia
+    actual_day = date.today()
+    orders = service.get_orders_date(actual_day)
+
+    if not orders:
+        raise HTTPException(status_code=404, detail="No hay compras este dia")
+
+    return orders
