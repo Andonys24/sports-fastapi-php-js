@@ -23,7 +23,22 @@ class ApiService {
                 },
                 body: JSON.stringify(data)
             });
-            if (!response.ok) throw new Error(`Error en la petición: ${response.status}`);
+
+            if (!response.ok) {
+                // Leemos el cuerpo del error para saber EXACTAMENTE que campo fallo
+                let detalle = null;
+                try {
+                    detalle = await response.json();
+                } catch (_) {
+                    // el cuerpo no era JSON, lo ignoramos
+                }
+                console.error(
+                    `Error ${response.status} en POST ${endpoint}:\n` +
+                    (detalle ? JSON.stringify(detalle, null, 2) : "(sin cuerpo JSON)")
+                );
+                return null;
+            }
+
             return await response.json();
         } catch (error) {
             console.error("Error POST:", error);

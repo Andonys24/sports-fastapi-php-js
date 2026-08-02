@@ -10,12 +10,28 @@ class AuthManager {
     }
 
     async registrar(datosUsuario) {
-        // Enviar datos al endpoint /api/v1/register
-        const respuesta = await this.api.post('/register', datosUsuario);
-        
+        // El backend expone el registro en /api/v1/users/ (POST)
+        // Ademas, UserCreate requiere: username, full_name, email, password
+        const payload = {
+            username: datosUsuario.email,   // se usa el correo como username
+            full_name: datosUsuario.nombre,
+            email: datosUsuario.email,
+            password: datosUsuario.password
+        };
+
+        const respuesta = await this.api.post('/users/', payload);
+
         if (respuesta && !respuesta.error) {
-            // Asumimos que el backend devuelve los datos del usuario tras registrarse
-            this.iniciarSesionLocal(respuesta.usuario);
+            // El backend devuelve el usuario creado directamente (UserResponse), no envuelto en "usuario",
+            // pero usa "full_name" en vez de "nombre". Lo normalizamos para el resto del frontend.
+            const usuario = {
+                id: respuesta.id,
+                nombre: respuesta.full_name,
+                email: respuesta.email,
+                username: respuesta.username,
+                tipo: respuesta.admin
+            };
+            this.iniciarSesionLocal(usuario);
             return true;
         }
         return false;
@@ -44,11 +60,29 @@ class AuthManager {
 
         const respuesta = await response.json();
         
-        // 3. FastAPI con OAuth2 suele devolver un token { "access_token": "...", "token_type": "bearer" }
+        
         if (respuesta && respuesta.access_token) {
-            // Guardamos el token y un objeto de usuario simulado o devuelto
-            const usuario = respuesta.usuario || { email: email, nombre: email.split('@')[0] };
-                                 
+            let usuario = { email: email, nombre: email.split('@')[0] }; // respaldo por si /auth/me falla
+
+            try {
+                const perfilResponse = await fetch(`${this.api.baseUrl}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${respuesta.access_token}` }
+                });
+
+                if (perfilResponse.ok) {
+                    const perfil = await perfilResponse.json(); // { id, username, full_name, email, admin }
+                    usuario = {
+                        id: perfil.id,
+                        nombre: perfil.full_name,
+                        email: perfil.email,
+                        username: perfil.username,
+                        tipo: perfil.admin
+                    };
+                }
+            } catch (error) {
+                console.error("No se pudo obtener el perfil desde /auth/me:", error);
+            }
+
             this.iniciarSesionLocal(usuario);
             return true;
         }
@@ -59,11 +93,9 @@ class AuthManager {
     return false;
 }
 
-    async logout() {
-        // Llamar al backend para destruir la cookie de sesión si existe
-        await this.api.post('/logout', {}); 
-        
-        // Limpiamos el almacenamiento local
+    logout() {
+        // (no hay cookie de sesión ni blacklist), asi que "cerrar sesión" es
+        // simplemente borrar los datos locales del navegador.
         this.usuarioActual = null;
         localStorage.removeItem('usuario_actual');
         
@@ -122,7 +154,8 @@ class AuthUI {
                 return;
             }
             alert(`¡Bienvenido de nuevo!`);
-            window.location.href = '/catalogo'; // Redirigir tras login exitoso
+            this.actualizarInterfaz(); // Refrescar botones/menu del header tras iniciar sesion
+            window.router.navegar('/catalogo'); // Redirigir tras login exitoso (via SPA router)
         } else {
             alert('Credenciales incorrectas. Intenta de nuevo.');
         }
@@ -140,7 +173,8 @@ class AuthUI {
         
         if (exito) {
             alert('Registro exitoso. Iniciando sesión...');
-            window.location.href = '/catalogo';
+            this.actualizarInterfaz(); // Refrescar botones/menu del header tras registrarse
+            window.router.navegar('/catalogo');
         } else {
             alert('Hubo un error al registrar el usuario.');
         }

@@ -15,9 +15,13 @@ class Router {
     inicializar() {
         // Interceptar navegación de los enlaces
         document.body.addEventListener('click', (e) => {
-            if (e.target.matches('[data-link]')) {
+            // Se usa closest() en vez de matches() porque algunos enlaces
+            // tienen elementos anidados (ej. un <button> dentro del <a data-link>),
+            // y el clic se registra sobre el hijo, no sobre el <a> en sí.
+            const enlace = e.target.closest('[data-link]');
+            if (enlace) {
                 e.preventDefault();
-                this.navegar(e.target.getAttribute('href'));
+                this.navegar(enlace.getAttribute('href'));
             }
         });
 
@@ -65,6 +69,8 @@ class Router {
 }
 
 // Inicializar el router una vez que el DOM esté listo
+// Se expone en window para que otros modulos (auth.js, etc.) puedan navegar
+// sin forzar una recarga completa de la pagina
 document.addEventListener('DOMContentLoaded', () => {
-    const router = new Router();
+    window.router = new Router();
 });

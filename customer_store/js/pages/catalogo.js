@@ -76,8 +76,6 @@ class Catalogo {
             const imgUrl = producto.img_url || 'https://via.placeholder.com/280x200?text=Sin+Imagen';
 
             const div = document.createElement('div');
-
-            const div = document.createElement('div');
             div.className = 'producto-card';
             div.innerHTML = `
                 <div style="height: 200px; overflow: hidden; border-radius: 8px; margin-bottom: 1rem;">
@@ -108,8 +106,13 @@ class Catalogo {
     }
 }
 
-// Modificar la inicialización en el router o archivo
-if (window.location.pathname === '/catalogo') {
-    const catalogo = new Catalogo(api);
-    document.addEventListener('DOMContentLoaded', () => catalogo.inicializar());
-}
+// La instancia se crea SIEMPRE al cargar la página (sin importar la ruta inicial),
+// para que router.js pueda encontrar la variable global "catalogo" y llamar a
+// catalogo.inicializar() cada vez que el usuario navegue a /catalogo dentro de la SPA.
+let catalogo;
+document.addEventListener('DOMContentLoaded', () => {
+    catalogo = new Catalogo(api);
+    if (window.location.pathname === '/catalogo') {
+        catalogo.inicializar();
+    }
+});
