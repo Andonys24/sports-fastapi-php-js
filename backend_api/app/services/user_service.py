@@ -43,6 +43,7 @@ class UserService:
                 email: str, admin: int) -> User | None:
         user = self.get_user_id(user_id)
 
+        # En el caso de no encontrar el usuario
         if not user:
             return None
 

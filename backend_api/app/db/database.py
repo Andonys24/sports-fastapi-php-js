@@ -1,5 +1,7 @@
 from fastapi import Depends
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
+from sqlalchemy.engine import Engine
+from sqlite3 import Connection
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
 from typing import Annotated
@@ -15,6 +17,14 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 # Validacion por negacion para evitar que DATABASE_URL sea pasada como None
 if not DATABASE_URL:
     raise ValueError("No se encontro la URL para la conexion con la base de datos")
+
+# Permite hacer cumplir las ForeignKeys, de forma que deben existir para poder crear un objeto
+@event.listens_for(Engine, "connect")
+def _set_sqlite_pragma(dbapi_connection, connection_record):
+    if isinstance(dbapi_connection, Connection):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON;")
+        cursor.close()
 
 connect_args = {"check_same_thread": False}
 
