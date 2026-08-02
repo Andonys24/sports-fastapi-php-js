@@ -13,13 +13,11 @@
             <li>
                 <p>Nombre: <span><?php echo s($product['name'] ?? ''); ?></span></p>
                 <p>Precio: <span>L. <?php echo s($product['price'] ?? '0.00'); ?></span></p>
-
-                <!-- Búsqueda directa y limpia -->
                 <p>Categoría: <span><?php echo s($categories[$catId] ?? 'Sin categoría'); ?></span></p>
                 <p>Proveedor: <span><?php echo s($providers[$provId] ?? 'Sin proveedor'); ?></span></p>
 
                 <div class="acciones">
-                    <a class="boton" href="/products/update?id=<?php echo s($product['id']); ?>">Actualizar</a>
+                    <a class="boton-actualizar" href="/products/update?id=<?php echo s($product['id']); ?>">Actualizar</a>
                     <button type="button" data-id="<?php echo s($product['id']); ?>" class="boton-eliminar producto">Eliminar</button>
                 </div>
             </li>

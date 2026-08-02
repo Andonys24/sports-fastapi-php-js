@@ -1,29 +1,20 @@
 <div class="campo">
-    <label for="producto">Producto</label>
+    <label for="product_name">Producto</label>
     <input
         type="text"
-        id="producto"
-        name="producto"
-        placeholder="Producto"
-        value="<?php echo s($inventory['product'] ?? ''); ?>">
+        id="product_name"
+        value="<?php echo s($inventory['product_name'] ?? ''); ?>"
+        readonly
+        disabled>
 </div>
 
 <div class="campo">
-    <label for="stock">Stock</label>
+    <label for="stock">Nuevo Stock Físico</label>
     <input
         type="number"
         id="stock"
+        placeholder="Cantidad en existencia"
         name="stock"
         min="0"
-        step="1"
-        placeholder="Stock"
-        value="<?php echo s($inventory['stock'] ?? ''); ?>">
-</div>
-
-<div class="campo">
-    <label for="observacion">Observación</label>
-    <textarea
-        id="observacion"
-        name="observacion"
-        placeholder="Observación de inventario"><?php echo s($inventory['note'] ?? ''); ?></textarea>
+        value="<?php echo s($inventory['stock'] ?? 0); ?>">
 </div>

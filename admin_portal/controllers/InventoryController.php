@@ -3,50 +3,74 @@
 namespace Controllers;
 
 use MVC\Router;
+use Services\ApiClient;
 
 class InventoryController
 {
     public static function index(Router $router)
     {
-        session_start();
         isAdmin();
 
-        $router->render('inventory/index', [
-            'title' => 'Inventario'
-        ]);
-    }
+        $api = new ApiClient();
+        $response = $api->get('/inventory');
 
-    public static function update(Router $router)
-    {
-        session_start();
-        isAdmin();
-
-        $alerts = [];
+        // Verificamos si la respuesta es un arreglo numérico/lista real
         $inventory = [];
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $alerts['error'][] = 'Módulo preparado. Falta integrar el endpoint de inventario con FastAPI.';
+        if (is_array($response) && array_is_list($response)) {
+            $inventory = $response;
         }
 
-        $router->render('inventory/update', [
-            'title' => 'Actualizar Inventario',
-            'alerts' => $alerts,
+        $router->render('inventory/index', [
+            'title'     => 'Inventario de Productos',
             'inventory' => $inventory
         ]);
     }
 
-    public static function delete()
+    private static function getPayload(): array
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            session_start();
-            isAdmin();
+        return [
+            'stock'  => (int) ($_POST['stock'] ?? 0),
+        ];
+    }
 
-            header('Content-Type: application/json');
-            echo json_encode([
-                'resultado' => false,
-                'mensaje' => 'Módulo de inventario pendiente de integración con FastAPI'
-            ]);
+    public static function update(Router $router)
+    {
+        isAdmin();
+
+        $alerts = [];
+        $id = filter_var($_GET["id"] ?? null, FILTER_VALIDATE_INT);
+
+        if (!$id) {
+            header("Location: /inventory");
             exit;
         }
+
+        $api = new ApiClient();
+        // Intentar obtener el registro del producto/inventario
+        $item = $api->get("/inventory/{$id}") ?? $api->get("/products/{$id}");
+
+        if (!$item) {
+            header('Location: /inventory');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $payload = self::getPayload();
+            $response = $api->put("/inventory/{$id}", $payload);
+
+            if ($response && !isset($response['detail']) && !isset($response['error'])) {
+                header('Location: /inventory');
+                exit;
+            }
+
+            $rawError = $response['detail'] ?? $response['error'] ?? 'Error al actualizar el inventario';
+            $alerts['error'][] = is_string($rawError) ? $rawError : 'Error en la actualización';
+        }
+
+        $router->render('inventory/update', [
+            'title'     => 'Ajustar Inventario',
+            'alerts'    => $alerts,
+            'inventory' => $item
+        ]);
     }
 }

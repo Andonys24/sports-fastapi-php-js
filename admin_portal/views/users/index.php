@@ -7,11 +7,10 @@
     <?php if (!empty($users)) : ?>
         <?php foreach ($users as $user) : ?>
             <li>
-                <p>Usuario: <span><?php echo s($user['username'] ?? ''); ?></span></p>
-                <p>Nombre: <span><?php echo s($user['full_name'] ?? ''); ?></span></p>
+                <p>Username: <span><?php echo s($user['username'] ?? ''); ?></span></p>
                 <p>Email: <span><?php echo s($user['email'] ?? ''); ?></span></p>
                 <div class="acciones">
-                    <a class="boton" href="/users/update?id=<?php echo s($user['id']); ?>">Actualizar</a>
+                    <a class="boton-actualizar" href="/users/update?id=<?php echo s($user['id']); ?>">Actualizar</a>
                     <button type="button" data-id="<?php echo s($user['id']); ?>" class="boton-eliminar usuario">Eliminar</button>
                 </div>
             </li>

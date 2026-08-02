@@ -7,6 +7,8 @@
 
 <?php if (isset($_SESSION['role']) && (int)$_SESSION['role'] === ROLE_ADMIN) : ?>
     <div class="barra-productos">
+        <a href="/admin" class="boton">Panel Principal</a>
+        <a href="/inventory" class="boton">Ver Inventario</a>
         <a href="/products" class="boton">Ver Productos</a>
         <a href="/products/create" class="boton">Agregar Producto</a>
         <a href="/categories" class="boton">Ver Categorías</a>
@@ -17,9 +19,5 @@
         <a href="/suppliers/create" class="boton">Agregar Proveedor</a>
         <a href="/purchases" class="boton">Ver Compras</a>
         <a href="/purchases/create" class="boton">Registrar Compra</a>
-        <a href="/inventory" class="boton">Ver Inventario</a>
-        <a href="/invoices" class="boton">Ver Facturas</a>
-        <a href="/invoices/create" class="boton">Crear Factura</a>
-        <a href="/admin" class="boton">Panel Principal</a>
     </div>
 <?php endif; ?>

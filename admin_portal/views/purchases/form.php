@@ -1,43 +1,55 @@
 <div class="campo">
-    <label for="proveedor">Proveedor</label>
-    <input
-        type="text"
-        id="proveedor"
-        name="proveedor"
-        placeholder="Proveedor"
-        value="<?php echo s($purchase['provider'] ?? ''); ?>">
+    <label for="product_id">Producto</label>
+    <select name="product_id" id="product_id">
+        <option value="" disabled <?php echo empty($purchase['product_id'] ?? null) ? 'selected' : ''; ?>>-- Seleccionar Producto --</option>
+        <?php foreach ($products ?? [] as $product) : ?>
+            <option value="<?php echo s($product['id']); ?>" <?php echo (($purchase['product_id'] ?? '') == $product['id']) ? 'selected' : ''; ?>>
+                <?php echo s($product['name']); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
 </div>
 
 <div class="campo">
-    <label for="producto">Producto</label>
-    <input
-        type="text"
-        id="producto"
-        name="producto"
-        placeholder="Producto"
-        value="<?php echo s($purchase['product'] ?? ''); ?>">
+    <label for="provider_id">Proveedor</label>
+    <select name="provider_id" id="provider_id">
+        <option value="" disabled <?php echo empty($purchase['provider_id'] ?? $purchase['supplier_id'] ?? null) ? 'selected' : ''; ?>>-- Seleccionar Proveedor --</option>
+        <?php foreach ($providers ?? [] as $provider) : ?>
+            <option value="<?php echo s($provider['id']); ?>" <?php echo ((($purchase['provider_id'] ?? $purchase['supplier_id'] ?? '') == $provider['id'])) ? 'selected' : ''; ?>>
+                <?php echo s($provider['name']); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
 </div>
 
 <div class="campo">
-    <label for="cantidad">Cantidad</label>
+    <label for="quantity">Cantidad</label>
     <input
         type="number"
-        id="cantidad"
-        name="cantidad"
+        id="quantity"
+        placeholder="Cantidad de unidades"
+        name="quantity"
         min="1"
-        step="1"
-        placeholder="Cantidad"
-        value="<?php echo s($purchase['quantity'] ?? ''); ?>">
+        value="<?php echo s($purchase['quantity'] ?? 1); ?>">
 </div>
 
 <div class="campo">
-    <label for="costo">Costo</label>
+    <label for="purchase_price">Precio de Compra (L.)</label>
     <input
         type="number"
-        id="costo"
-        name="costo"
-        min="0"
+        id="purchase_price"
+        placeholder="Costo unitario de compra"
+        name="purchase_price"
+        value="<?php echo s($purchase['purchase_price'] ?? ''); ?>"
         step="0.01"
-        placeholder="Costo total"
-        value="<?php echo s($purchase['cost'] ?? ''); ?>">
+        min="0">
+</div>
+
+<div class="campo">
+    <label for="date">Fecha de Compra</label>
+    <input
+        type="date"
+        id="date"
+        name="date"
+        value="<?php echo s($purchase['date'] ?? date('Y-m-d')); ?>">
 </div>

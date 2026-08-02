@@ -11,5 +11,5 @@
         <input type="password" name="password" id="password" placeholder="Ingresa tu Password">
         <i class="fa-solid fa-eye eye-icon" id="eye-icon"></i>
     </div>
-    <input type="submit" class="boton" value="Iniciar Sesion">
+    <input type="submit" class="boton-guardar" value="Iniciar Sesion">
 </form>

@@ -1,0 +1,30 @@
+{
+	"name": "admin-sport-store",
+	"version": "1.0.0",
+	"description": "Proyecto Sport Store",
+	"main": "index.js",
+	"scripts": {
+		"dev": "gulp dev"
+	},
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"autoprefixer": "^10.4.0",
+		"css-loader": "^7.1.2",
+		"cssnano": "^5.1.10",
+		"gulp": "^4.0.2",
+		"gulp-postcss": "^9.0.0",
+		"gulp-rename": "^2.0.0",
+		"gulp-sass": "^5.0.0",
+		"gulp-sourcemaps": "^3.0.0",
+		"gulp-terser-js": "^5.2.2",
+		"sass": "^1.41.1",
+		"style-loader": "^4.0.0",
+		"terser": "^5.14.2"
+	},
+	"dependencies": {
+		"sweetalert2": "^11.12.4",
+		"swiper": "^11.1.8",
+		"webpack-stream": "^7.0.0"
+	}
+}

@@ -9,9 +9,6 @@ class ProviderController
 {
     public static function index(Router $router)
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
         isAdmin();
 
         $api = new ApiClient();
@@ -37,9 +34,6 @@ class ProviderController
 
     public static function create(Router $router)
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
         isAdmin();
 
         $alerts = [];
@@ -69,9 +63,6 @@ class ProviderController
 
     public static function update(Router $router)
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
         isAdmin();
 
         $alerts = [];
@@ -113,9 +104,6 @@ class ProviderController
     public static function delete()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
-            }
             isAdmin();
 
             $id = $_POST['id'] ?? null;

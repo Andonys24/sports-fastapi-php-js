@@ -1,0 +1,65 @@
+@use "base/variables" as v;
+@use "base/mixins" as m;
+
+.listado-productos {
+	display: grid;
+	gap: 2rem;
+
+	@include m.tablet {
+		@include m.grid(2, 2rem);
+	}
+
+	.producto {
+		background-color: v.$blanco;
+		padding: 2rem;
+		border-radius: 1rem;
+		transition-property: transform;
+		transition-duration: 300ms;
+		text-align: center;
+
+		&.seleccionado {
+			background-color: v.$naranja;
+
+			p {
+				color: v.$blanco;
+			}
+		}
+
+
+
+		p {
+			color: v.$negro;
+			margin: 0 0 calc(v.$separacion / 4) 0;
+		}
+
+		.precio-producto {
+			color: v.$naranja;
+			font-weight: v.$bold;
+			font-size: 3rem;
+			margin: 0;
+		}
+
+		img {
+			max-width: 6rem;
+			max-height: 6rem;
+			border-radius: 0.5rem;
+		}
+
+		.contenedor-btn {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			text-align: center;
+			align-items: center;
+
+			@include m.tablet {
+				display: flex;
+				justify-content: space-around;
+			}
+
+			.cantidad-producto {
+				margin: 0;
+				font-size: 2.5rem;
+			}
+		}
+	}
+}

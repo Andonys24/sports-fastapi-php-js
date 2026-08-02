@@ -10,9 +10,6 @@ class ProductController
 
     public static function index(Router $router)
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
         isAdmin();
 
         $api = new ApiClient();
@@ -44,7 +41,7 @@ class ProductController
         ]);
     }
 
-    private static function getPayload(): array
+    private static function getPayload(int $stockValue = 0): array
     {
         return [
             'category_id' => $_POST['categoria_id'] ?? 0,
@@ -52,16 +49,13 @@ class ProductController
             'name'        => $_POST['nombre'] ?? '',
             'price'       => (float) ($_POST['precio'] ?? 0),
             'brand'       => $_POST['brand'] ?? '',
-            'stock'       => (int) ($_POST['stock'] ?? 0),
+            'stock'       => $stockValue,
             'img_url'     => $_POST['img_url'] ?? ''
         ];
     }
 
     public static function create(Router $router)
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
         isAdmin();
 
         $alerts = [];
@@ -72,7 +66,7 @@ class ProductController
         $providers = is_array($providersResponse) && array_is_list($providersResponse) ? $providersResponse : [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $payload = self::getPayload();
+            $payload = self::getPayload(0);
 
             $response = $api->post('/products', $payload);
 
@@ -104,9 +98,6 @@ class ProductController
 
     public static function update(Router $router)
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
         isAdmin();
         $alerts = [];
         $id = filter_var($_GET["id"] ?? null, FILTER_VALIDATE_INT);
@@ -128,7 +119,8 @@ class ProductController
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $payload = self::getPayload();
+            $currentStock = (int) ($product['stock'] ?? 0);
+            $payload = self::getPayload($currentStock);
 
             $response = $api->put("/products/{$id}", $payload);
 
@@ -152,9 +144,6 @@ class ProductController
     public static function delete()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
-            }
             isAdmin();
 
             $api = new ApiClient();

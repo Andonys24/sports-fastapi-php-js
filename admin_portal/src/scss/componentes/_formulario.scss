@@ -1,0 +1,78 @@
+@use "base/variables" as v;
+@use "base/mixins" as m;
+
+.formulario {
+	margin-top: 5rem;
+	width: 98%;
+}
+
+.campo {
+	display: flex;
+	margin-bottom: 2rem;
+	align-items: center;
+	label {
+		flex: 0 0 10rem;
+	}
+	input, textarea {
+		flex: 1;
+		border: none;
+		padding: calc(v.$separacion / 4);
+		border-radius: 1rem;
+
+		&:disabled {
+			background-color: lighten(v.$negro, 30%);
+			color: v.$blanco;
+			cursor: not-allowed;
+		}
+
+		
+	}
+
+	textarea {
+		field-sizing: content;
+		max-height: 15rem;
+		resize: none;
+	}
+
+	select{
+		padding: 1.5rem;
+		border: 1px solid v.$negro;
+		border-radius: 1rem;
+	}
+
+	p{
+		font-size: 1.6rem;
+	}
+
+	input[type="file"] {
+			border: none;
+			background-color: v.$blanco;
+			color: v.$negro;
+		}
+
+	&__password {
+		position: relative;
+
+		.eye-icon {
+			position: absolute;
+			color: v.$negro;
+			right: 1rem;
+			top: 50%;
+			transform: translateY(-50%);
+			cursor: pointer;
+			transition: scale 0.3s ease-in;
+
+			&:hover{
+				scale: 1.1;
+			}
+		}
+	}
+
+	&__imagen{
+		 img{
+			max-width: 12rem;
+			max-height: 12rem;
+			border-radius: 0.5rem;
+		 }
+	}
+}

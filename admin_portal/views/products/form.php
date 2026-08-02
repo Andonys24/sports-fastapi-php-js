@@ -55,11 +55,6 @@
 </div>
 
 <div class="campo">
-    <label for="stock">Stock</label>
-    <input type="number" id="stock" placeholder="Cantidad en stock" name="stock" min="0" value="<?php echo s($product['stock'] ?? 0); ?>">
-</div>
-
-<div class="campo">
     <label for="img_url">URL de Imagen</label>
     <input type="text" id="img_url" placeholder="https://..." name="img_url" value="<?php echo s($product['img_url'] ?? ''); ?>">
 </div>

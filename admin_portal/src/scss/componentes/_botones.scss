@@ -1,0 +1,49 @@
+@use "base/variables" as v;
+@use "base/mixins" as m;
+
+.boton {
+	@include m.boton(v.$logo-rojo, v.$blanco);
+
+	& {
+		border-radius: 1rem;
+	}
+}
+
+.boton-eliminar {
+	@include m.boton(v.$rojo, v.$blanco);
+
+	& {
+		border-radius: 1rem;
+		transition: scale 0.3s ease-in-out;
+
+		&:hover {
+			scale: 1.1;
+		}
+	}
+}
+
+.boton-actualizar {
+	@include m.boton(v.$naranja, v.$blanco);
+
+	& {
+		border-radius: 1rem;
+		transition: scale 0.3s ease-in-out;
+	}
+}
+
+.boton-guardar {
+	@include m.boton(v.$azul, v.$blanco);
+
+	& {
+		border-radius: 1rem;
+		transition: scale 0.3s ease-in-out;
+	}
+}
+
+.btn-agregar {
+	@include m.boton-menu(v.$verde, v.$blanco);
+}
+
+.btn-quitar {
+	@include m.boton-menu(v.$rojo, v.$blanco);
+}

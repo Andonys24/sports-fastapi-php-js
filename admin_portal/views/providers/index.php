@@ -13,7 +13,7 @@
                 <p>Periodo de contrato: <span><?php echo s((string)($provider['contract_period'] ?? '')); ?></span></p>
                 <p>Tipo de contrato: <span><?php echo s($provider['contract_type'] ?? ''); ?></span></p>
                 <div class="acciones">
-                    <a class="boton" href="/suppliers/update?id=<?php echo s($provider['id']); ?>">Actualizar</a>
+                    <a class="boton-actualizar" href="/suppliers/update?id=<?php echo s($provider['id']); ?>">Actualizar</a>
                     <input type="submit" data-id="<?php echo s($provider['id']); ?>" value="Eliminar" class="boton-eliminar proveedor">
                 </div>
             </li>

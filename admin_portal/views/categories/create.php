@@ -8,5 +8,5 @@ include_once __DIR__ . '/../templates/alerts.php';
 
 <form action="/categories/create" method="post" class="formulario">
     <?php include_once __DIR__ . '/form.php'; ?>
-    <input type="submit" class="boton" value="Guardar Categoría">
+    <input type="submit" class="boton-actualizar" value="Guardar Categoría">
 </form>
