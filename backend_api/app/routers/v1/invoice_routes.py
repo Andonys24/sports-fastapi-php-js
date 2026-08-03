@@ -41,15 +41,3 @@ async def get_invoice_id(invoice_id: int, service: InvoiceService = Depends(get_
         raise HTTPException(status_code=404, detail="No se encontro la factura")
 
     return invoice
-
-@router.delete("/{invoice_id}", status_code=200)
-async def delete_invoice(invoice_id: int, service: InvoiceService = Depends(get_invoice_service)):
-    try:
-        invoice_confirmation = service.delete_invoice(invoice_id)
-
-        if not invoice_confirmation:
-            raise HTTPException(status_code=404, detail="No se encontro la factura")
-
-        return {"resultado": True, "mensaje": "Factura eliminada correctamente"}
-    except IntegrityError:
-        raise HTTPException(status_code=500, detail="No se puede borrar el registro, debido a que esta relacionado a otras tablas")
