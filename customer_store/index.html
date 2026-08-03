@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Tienda</title>
+    <!-- Aquí iría tu archivo CSS principal -->
+    <link rel="stylesheet" href="./css/estilos.css">
+</head>
+<body>
+
+    <!-- Navegación Principal -->
+    <header>
+        <nav>
+            <a href="/" data-link>Inicio</a>
+            <a href="/catalogo" data-link>Catálogo</a>
+            
+            <!-- Elementos condicionales de Auth -->
+            <span class="solo-visitantes">
+                <a href="/login" data-link>Iniciar Sesión</a>
+                <a href="/registro" data-link>Registrarse</a>
+            </span>
+            
+            <span class="solo-usuarios" style="display: none;">
+                <span id="nombre-usuario-header"></span>
+                <button id="btn-logout">Cerrar Sesión</button>
+            </span>
+
+            <a href="/carrito" data-link>
+                Carrito (<span id="carrito-contador">0</span>)
+            </a>
+        </nav>
+    </header>
+
+    <!-- Contenedor Principal de Vistas -->
+    <main id="app">
+        
+        <!-- Vista: Inicio -->
+        <section id="vista-inicio">
+            <h1>Bienvenido a la Tienda</h1>
+            <p>Descubre nuestros productos.</p>
+        </section>
+
+        <!-- Vista: Catálogo -->
+        <section id="vista-catalogo" style="display: none;">
+            <h2>Nuestro Catálogo</h2>
+            <!-- Filtro por categoría -->
+            <div style="margin-bottom: 1.5rem;">
+                <label for="filtro-categoria">Filtrar por: </label>
+                <select id="filtro-categoria" style="max-width: 250px;">
+                <option value="Todas">Cargando categorías...</option>
+            </select>
+            </div>
+            
+            <div id="catalogo-productos" class="grid-productos">
+                <!-- Se inyecta con catalogo.js -->
+            </div>
+        </section>
+
+        <!-- Vista: Carrito -->
+        <section id="vista-carrito" style="display: none;">
+            <h2>Tu Carrito</h2>
+            <div id="contenido-carrito">
+                <!-- Aquí puedes añadir la lógica para renderizar los items del carrito -->
+            </div>
+            <a href="/checkout" data-link><button>Proceder al Pago</button></a>
+        </section>
+
+        <!-- Vista: Checkout -->
+        <section id="vista-checkout" style="display: none;">
+            <h2>Finalizar Compra</h2>
+            <div id="checkout-resumen"></div>
+            <form id="form-checkout">
+                <input type="text" id="nombre" placeholder="Nombre completo" required>
+
+                <!-- Opción de entrega a domicilio alineada con CompraCliente -->
+                <div style="margin: 1rem 0;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="checkbox" id="entrega-domicilio" style="width: auto;">
+                    <strong>Solicitar entrega a domicilio</strong>
+                </label>
+                </div>
+
+                <!-- Este input se mostrará/ocultará dinámicamente -->
+                <input type="text" id="direccion" placeholder="Dirección de entrega" style="display: none;">
+                    <select id="metodo_pago" required>
+                    <option value="Efectivo">Pago en Efectivo</option>
+                    <option value="Transferencia">Transferencia Bancaria</option>
+                </select>
+                <button type="submit">Confirmar Pedido y Generar Factura</button>
+            </form>
+        </section>
+
+        <!-- Vista: Login -->
+        <section id="vista-login" style="display: none;">
+            <h2>Iniciar Sesión</h2>
+            <form id="form-login">
+                <input type="email" id="email" placeholder="Correo" required>
+                <input type="password" id="password" placeholder="Contraseña" required>
+                <button type="submit">Entrar</button>
+            </form>
+        </section>
+
+        <!-- Vista: Registro -->
+        <section id="vista-registro" style="display: none;">
+            <h2>Registro</h2>
+            <form id="form-registro">
+                <input type="text" id="nombre_registro" placeholder="Nombre" required>
+                <input type="email" id="email_registro" placeholder="Correo" required>
+                <input type="password" id="password_registro" placeholder="Contraseña" required>
+                <button type="submit">Registrarme</button>
+            </form>
+        </section>
+
+    </main>
+
+    <!-- Carga de Scripts modulares -->
+    <script src="./js/services/ApiService.js"></script>
+    <script src="./js/pages/auth.js"></script>
+    <script src="./js/pages/carrito.js"></script>
+    <script src="./js/pages/catalogo.js"></script>
+    <script src="./js/pages/checkout.js"></script>
+    <script src="./js/router.js"></script>
+</body>
+</html>
