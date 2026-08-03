@@ -64,14 +64,3 @@ class OrderService:
         ).join(Order, User.id == Order.user_id
         ).join(Invoice, Product.id == Invoice.product_id,
         ).filter(Order.date_order == date_order).all()
-
-    def delete_order(self, order_id: int) -> bool:
-        order = self._db.query(Order).filter(Order.id == order_id).first()
-
-        if not order:
-            return False
-
-        self._db.delete(order)
-        self._db.commit()
-
-        return True

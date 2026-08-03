@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, Path, Body
 from models.user import UserCreate, UserUpdate, UserResponse
 from services.user_service import UserService
-from services.authentication_utils import hash_password
 from db.database import db_dependency
 from sqlalchemy.exc import IntegrityError
 
@@ -25,15 +24,8 @@ async def create_user(user_create: UserCreate, service: UserService = Depends(ge
         raise HTTPException(status_code=400, detail="El nombre de usuario ya existe")
 
     # En caso contrario, procede a crear un nuevo usuario
-    # Crea una contrasena cifrada con hash a partir de la contrasena en texto plano
-    password_hashed = hash_password(user_create.password)
-
     # Retorna inmediatamente el usuario creado
-    return service.create_user(
-        # Se envia la contrasena encriptada por separado
-        password=password_hashed, 
-        # Se envian los demas atributos de un usuario, excluyendo password, debido a que ya fue enviada
-        **user_create.model_dump(exclude={"password"})) 
+    return service.create_user(**user_create.model_dump()) 
 
 # Metodo GET para obtener una cierta cantidad de usuarios
 @router.get("/", response_model=list[UserResponse], status_code=200)
@@ -59,16 +51,11 @@ async def update_user(id_user: int = Path(..., alias="id"),
         user_update: UserUpdate = Body(...), service: UserService = Depends(get_user_service)):
     try:
         # Validacion en el caso que no se envie una contrasena
-        if (not user_update.password or user_update.password.strip() == ""):
-            user_tmp = service.update_user(id_user, **user_update.model_dump())
+        if not user_update.password:
+            # Envia None como contrasena, 
+            user_tmp = service.update_user(user_id=id_user, password=None, **user_update.model_dump(exclude={"password"}))
         else:
-            # Crea una nueva contrasena encriptada solo cuando se proporcione una
-            new_password_hashed = hash_password(user_update.password)
-            
-            user_tmp = service.update_user(
-                id_user, 
-                password=new_password_hashed, 
-                **user_update.model_dump(exclude={"password"}))
+            user_tmp = service.update_user(user_id=id_user, **user_update.model_dump())
 
         # Validacion por si no se encontro el usuario
         if (not user_tmp):

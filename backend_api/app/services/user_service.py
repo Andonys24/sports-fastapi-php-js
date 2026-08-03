@@ -1,6 +1,6 @@
 from db.database import Session
 from db.schemas.user_schema import User # Obtiene el usuario a partir del cual se crearon las tablas
-from services.authentication_utils import verify_password
+from services.authentication_utils import verify_password, hash_password
 
 class UserService:
     def __init__(self, db: Session) -> None:
@@ -10,9 +10,12 @@ class UserService:
     def create_user(self, username: str, password: str, full_name: str,
                 email: str, admin: int = 0) -> User:
         # Crea un nuevo objeto de tipo User, con los datos que le sean pasados como atributos
+        # Encripta la contrasena enviada siempre, cada vez que se cree un usuario
+        hashed_passwd = hash_password(password)
+
         user = User(
             username=username,
-            password=password,
+            password=hashed_passwd, 
             full_name=full_name,
             email=email,
             admin=admin
@@ -39,8 +42,8 @@ class UserService:
         return self._db.query(User).filter(User.username == username).first()
     
     # Definicion del metodo PUT
-    def update_user(self, user_id: int, username: str, password: str, full_name: str,
-                email: str, admin: int) -> User | None:
+    def update_user(self, user_id: int, username: str, password: str | None, 
+                full_name: str, email: str, admin: int) -> User | None:
         user = self.get_user_id(user_id)
 
         # En el caso de no encontrar el usuario
@@ -48,11 +51,20 @@ class UserService:
             return None
 
         user.username = username
-        user.password = password
         user.full_name = full_name
         user.email = email
         user.admin = admin
 
+        # Validacion para evitar actualizar la contrasena en el caso que se haya enviado vacia
+        # Comprueba si se envio una contrasena, la cual puede ser opcional
+        if (password and password.strip()):
+            # En el caso que se envie una contrasena, la encriptada y la guarda encriptada en la base de datos
+            hashed_passwd = hash_password(password)
+
+            # Actualiza la contrasena del usuario
+            user.password = hashed_passwd
+
+        # En caso contrario, no actualiza la contrasena pero si los demas campos, actualizando en la base de datos
         self._db.commit()
         self._db.refresh(user)
 
