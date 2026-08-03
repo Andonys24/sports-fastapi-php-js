@@ -32,22 +32,9 @@ async def get_order_id(order_id: int, service: OrderService = Depends(get_order_
 
     return order
 
-@router.delete("/{order_id}", status_code=200)
-async def delete_order(order_id: int, service: OrderService = Depends(get_order_service)):
-    try:
-        order_deleted = service.delete_order(order_id)
-
-        if not order_deleted:
-            raise HTTPException(status_code=404, detail="No se encontro la orden")
-
-        return {"resultado": True, "mensaje": "Orden eliminada"}
-    except IntegrityError:
-        raise HTTPException(status_code=500, detail="No se puede borrar el registro, debido a que esta relacionado a otras tablas")
-
 @router.get("/daily/{date_order}", response_model=list[OrderDaily], status_code=200)
-async def get_daily_order(service: OrderService = Depends(get_order_service)):
-    # Obtiene los encargos del dia
-    actual_day = date.today()
+async def get_daily_order(actual_day: date = date.today(), service: OrderService = Depends(get_order_service)):
+    # Agrega la fecha obtenida como parametro, con el formato YYYY-MM-DD
     orders = service.get_orders_date(actual_day)
 
     if not orders:

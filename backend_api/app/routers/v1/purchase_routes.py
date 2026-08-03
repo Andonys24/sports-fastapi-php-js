@@ -38,15 +38,3 @@ async def get_purchase_id(purchase_id: int, service: PurchaseService = Depends(g
         raise HTTPException(status_code=404, detail="No se encontro la compra")
 
     return purchase
-
-@router.delete("/{purchase_id}", status_code=200)
-async def delete_purchase(purchase_id: int, service: PurchaseService = Depends(get_purchases_services)):
-    try:
-        confirmation = service.delete_purchase(purchase_id)
-
-        if not confirmation:
-            raise HTTPException(status_code=404, detail="Compra no encontrada")
-
-        return {"resultado": True, "mensaje": "Compra eliminada exitosamente"}
-    except IntegrityError:
-        raise HTTPException(status_code=500, detail="No se puede borrar el registro, debido a que esta relacionado a otras tablas")

@@ -41,7 +41,7 @@ class PurchaseService:
 
         # Calcula el nuevo stock, y lo envia a la base de datos
         new_stock = product_tmp.stock + purchase.quantity
-        product_service.update_product_stock(product_id=product_tmp.id, new_stock=new_stock)
+        product_service.update_product_stock(product=product_tmp, new_stock=new_stock)
 
         return purchase
 
@@ -71,14 +71,3 @@ class PurchaseService:
             return None
 
         return purchase
-
-    def delete_purchase(self, purchase_id: int) -> bool:
-        purchase = self._db.query(Purchase).filter(Purchase.id == purchase_id).first()
-
-        if not purchase:
-            return False
-
-        self._db.delete(purchase)
-        self._db.commit()
-
-        return True
