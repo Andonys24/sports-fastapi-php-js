@@ -70,14 +70,3 @@ class InvoiceService:
             return None
 
         return invoice
-
-    def delete_invoice(self, invoice_id: int) -> bool:
-        invoice = self._db.query(Invoice).filter(Invoice.id == invoice_id).first()
-
-        if not invoice:
-            return False
-
-        self._db.delete(invoice)
-        self._db.commit()
-
-        return invoice
